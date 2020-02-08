@@ -17,6 +17,7 @@ pub struct Components {
     pub wall_collisions: Storage<WallCollision>,
     pub gravity: Storage<Gravity>,
     pub ignore_bridges: Storage<IgnoreBridges>,
+    pub player_state: Storage<PlayerState>,
 }
 
 impl Components {
@@ -44,6 +45,7 @@ impl Components {
         self.wall_collisions.remove(e);
         self.gravity.remove(e);
         self.ignore_bridges.remove(e);
+        self.player_state.remove(e);
     }
 }
 
@@ -77,6 +79,28 @@ impl Sub for Velocity {
         Velocity {
             x: self.x - other.x,
             y: self.y - other.y,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum PlayerState {
+    Idle,
+    Walking,
+    Jumping,
+    Falling,
+    Dying,
+    Dead,
+}
+
+impl PlayerState {
+    pub fn is_grounded(self) -> bool {
+        match self {
+            PlayerState::Idle | PlayerState::Walking => true,
+            PlayerState::Jumping
+            | PlayerState::Falling
+            | PlayerState::Dying
+            | PlayerState::Dead => false,
         }
     }
 }
@@ -179,7 +203,7 @@ impl BitAnd for CollisionDirection {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Grounded;
 
 #[derive(Debug, Clone, Copy)]

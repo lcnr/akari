@@ -12,10 +12,10 @@ pub fn debug_colliders<T: DrawTarget>(
 ) -> Result<(), crow::Error> {
     for (&Position { x, y }, collider) in (positions, colliders).join() {
         let color = match collider.ty {
-            ColliderType::Player => (0.2, 0.9, 0.2, 0.8),
-            ColliderType::PlayerDamage => (0.8, 0.2, 0.3, 0.8),
-            ColliderType::Environment => (0.3, 0.7, 0.7, 0.8),
-            ColliderType::Bridge => (0.7, 0.3, 0.7, 0.8),
+            ColliderType::Player => (0.0, 1.0, 0.0, 0.8),
+            ColliderType::PlayerDamage => (1.0, 0.0, 0.0, 0.8),
+            ColliderType::Environment => (0.0, 0.7, 0.7, 0.8),
+            ColliderType::Bridge => (0.0, 0.0, 1.0, 0.8),
         };
 
         let xw = (x + collider.w).round() as i32;
