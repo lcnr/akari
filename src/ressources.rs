@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 use crate::{input::InputState, time::Time};
 
 pub struct Ressources {
@@ -7,7 +9,7 @@ pub struct Ressources {
     pub pressed_space: Option<JumpBuffer>,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Config {
     pub gravity: GravityConfig,
     pub input_buffer: InputBufferConfig,
@@ -25,7 +27,7 @@ impl Ressources {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PlayerConfig {
     pub jump_speed: f32,
     pub movement_speed: f32,
@@ -44,7 +46,7 @@ impl Default for PlayerConfig {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GravityConfig {
     pub acceleration: f32,
     pub terminal_velocity: f32,
@@ -59,7 +61,7 @@ impl Default for GravityConfig {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct InputBufferConfig {
     pub jump_buffer_frames: u8,
 }

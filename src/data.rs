@@ -18,6 +18,7 @@ pub struct Components {
     pub gravity: Storage<Gravity>,
     pub ignore_bridges: Storage<IgnoreBridges>,
     pub player_state: Storage<PlayerState>,
+    pub depths: Storage<Depth>,
 }
 
 impl Components {
@@ -46,6 +47,7 @@ impl Components {
         self.gravity.remove(e);
         self.ignore_bridges.remove(e);
         self.player_state.remove(e);
+        self.depths.remove(e);
     }
 }
 
@@ -79,6 +81,33 @@ impl Sub for Velocity {
         Velocity {
             x: self.x - other.x,
             y: self.y - other.y,
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum Depth {
+    Background,
+    Bridges,
+    Grass,
+    Unspecified,
+    Player,
+    Tiles,
+    EditorSelection,
+    Particles,
+}
+
+impl From<Depth> for f32 {
+    fn from(depth: Depth) -> f32 {
+        match depth {
+            Depth::Background => -1.0,
+            Depth::Bridges => -0.2,
+            Depth::Grass => -0.1,
+            Depth::Unspecified => 0.0,
+            Depth::Player => 0.1,
+            Depth::Tiles => 0.2,
+            Depth::EditorSelection => 0.3,
+            Depth::Particles => 0.4,
         }
     }
 }

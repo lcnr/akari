@@ -24,7 +24,8 @@ impl Time {
 
     pub fn frame(&mut self) {
         self.frame_count += 1;
-        if let Some(dur) = (Duration::from_micros(1_000_000 / self.fps as u64) * self.frame_count)
+        if let Some(dur) = (Duration::from_micros(1_000_000 / u64::from(self.fps))
+            * self.frame_count)
             .checked_sub(self.start.elapsed())
         {
             thread::sleep(dur)

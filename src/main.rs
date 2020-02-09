@@ -1,5 +1,6 @@
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::match_ref_pats)]
+#![warn(clippy::cast_lossless)]
 
 #[macro_use]
 extern crate log;
@@ -10,6 +11,7 @@ use crow::{
 };
 
 pub mod data;
+pub mod environment;
 pub mod input;
 pub mod physics;
 pub mod ressources;
@@ -18,7 +20,9 @@ pub mod time;
 
 use systems::*;
 
-const GAME_SIZE: (u32, u32) = (720, 480);
+const ARENA_WIDTH: usize = 16;
+const ARENA_HEIGHT: usize = 12;
+const GAME_SIZE: (u32, u32) = (20 * ARENA_WIDTH as u32, 20 * ARENA_HEIGHT as u32);
 const FPS: u32 = 60;
 
 fn main() -> Result<(), crow::Error> {
@@ -33,11 +37,9 @@ fn main() -> Result<(), crow::Error> {
     let mut s = Systems::new();
 
     let player = c.new_entity();
-    let ground = c.new_entity();
-    let bridge = c.new_entity();
 
     c.positions
-        .insert(player, data::Position { x: 50.0, y: 400.0 });
+        .insert(player, data::Position { x: 50.0, y: 100.0 });
     c.colliders.insert(
         player,
         data::Collider {
@@ -51,27 +53,17 @@ fn main() -> Result<(), crow::Error> {
     c.gravity.insert(player, data::Gravity);
     c.player_state.insert(player, data::PlayerState::Idle);
 
-    c.positions
-        .insert(ground, data::Position { x: 0.0, y: 0.0 });
-    c.colliders.insert(
-        ground,
-        data::Collider {
-            w: 200.0,
-            h: 200.0,
-            ty: data::ColliderType::Environment,
-        },
-    );
+    let f = std::fs::File::open("ressources/environment.rs").expect("Failed opening file");
+    let config: environment::EnvironmentConfig = match ron::de::from_reader(f) {
+        Ok(x) => x,
+        Err(e) => {
+            println!("Failed to load config: {}", e);
 
-    c.positions
-        .insert(bridge, data::Position { x: 20.0, y: 250.0 });
-    c.colliders.insert(
-        bridge,
-        data::Collider {
-            w: 200.0,
-            h: 20.0,
-            ty: data::ColliderType::Bridge,
-        },
-    );
+            std::process::exit(1);
+        }
+    };
+
+    let env = environment::Environment::load(&mut c, &config);
 
     loop {
         if r.input_state.update(ctx.events_loop()) {
