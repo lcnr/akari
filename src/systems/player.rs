@@ -11,6 +11,9 @@ pub struct PlayerStateMachine;
 
 impl PlayerStateMachine {
     pub fn run(&mut self, c: &mut Components, r: &mut Ressources, collisions: &Collisions) {
+        #[cfg(feature = "profiler")]
+        profile_scope!("run");
+
         for (state, velocity, grounded, entity) in (
             &mut c.player_state,
             &mut c.velocities,

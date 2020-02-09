@@ -13,3 +13,7 @@ ordered-float = "1"
 log = "0.4"
 crow = "0.2"
 crow_ecs = { git = "https://github.com/lcnr/crow_ecs" }
+thread_profiler = { version = "0.3", optional = true }
+
+[features]
+profiler = ["thread_profiler", "thread_profiler/thread_profiler"]

@@ -13,6 +13,9 @@ impl BridgeCollisionSystem {
         ignore_bridges: &Storage<IgnoreBridges>,
         collisions: &mut Collisions,
     ) {
+        #[cfg(feature = "profiler")]
+        profile_scope!("run");
+
         for Collision(bridge, other) in collisions.bridge.drain(..) {
             if ignore_bridges.get(other).is_none() {
                 let bridge_pos = positions.get(bridge).copied().unwrap();

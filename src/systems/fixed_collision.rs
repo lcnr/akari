@@ -35,6 +35,9 @@ impl FixedCollisionSystem {
         time: &Time,
         collisions: &Collisions,
     ) {
+        #[cfg(feature = "profiler")]
+        profile_scope!("run");
+
         wall_collisions.clear();
         for &Collision(e, p) in collisions.fixed.iter() {
             self.moved.entry(p).or_insert_with(Vec::new).push(e);

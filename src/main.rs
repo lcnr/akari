@@ -2,6 +2,10 @@
 #![allow(clippy::match_ref_pats)]
 #![warn(clippy::cast_lossless)]
 
+#[cfg(feature = "profiler")]
+#[macro_use]
+extern crate thread_profiler;
+
 #[macro_use]
 extern crate log;
 
@@ -26,6 +30,9 @@ const GAME_SIZE: (u32, u32) = (20 * ARENA_WIDTH as u32, 20 * ARENA_HEIGHT as u32
 const FPS: u32 = 60;
 
 fn main() -> Result<(), crow::Error> {
+    #[cfg(feature = "profiler")]
+    thread_profiler::register_thread_with_profiler();
+
     let mut ctx = Context::new(
         WindowBuilder::new().with_dimensions(From::from(GAME_SIZE)),
         EventsLoop::new(),
@@ -66,6 +73,9 @@ fn main() -> Result<(), crow::Error> {
     let env = environment::Environment::load(&mut c, &config);
 
     loop {
+        #[cfg(feature = "profiler")]
+        profile_scope!("frame");
+
         if r.input_state.update(ctx.events_loop()) {
             break;
         }
@@ -119,5 +129,7 @@ fn main() -> Result<(), crow::Error> {
         r.time.frame();
     }
 
+    #[cfg(feature = "profiler")]
+    thread_profiler::write_profile("profile.json");
     Ok(())
 }

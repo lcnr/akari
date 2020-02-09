@@ -13,6 +13,9 @@ impl InputBufferSystem {
         space: &mut Option<JumpBuffer>,
         config: &InputBufferConfig,
     ) {
+        #[cfg(feature = "profiler")]
+        profile_scope!("run");
+
         if let &mut Some(JumpBuffer(c)) = space {
             *space = c.checked_sub(1).map(JumpBuffer);
         }

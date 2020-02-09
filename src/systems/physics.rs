@@ -25,6 +25,9 @@ impl PhysicsSystem {
         grounded: &mut Storage<Grounded>,
         time: &Time,
     ) -> &mut Collisions {
+        #[cfg(feature = "profiler")]
+        profile_scope!("run");
+
         self.collisions.clear();
 
         previous_positions.clear();

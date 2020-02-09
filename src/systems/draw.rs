@@ -10,6 +10,9 @@ pub fn debug_colliders<T: DrawTarget>(
     positions: &Storage<Position>,
     colliders: &Storage<Collider>,
 ) -> Result<(), crow::Error> {
+    #[cfg(feature = "profiler")]
+    profile_scope!("debug_colliders");
+
     for (&Position { x, y }, collider) in (positions, colliders).join() {
         let color = match collider.ty {
             ColliderType::Player => (0.0, 1.0, 0.0, 0.8),
