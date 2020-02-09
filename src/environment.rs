@@ -122,15 +122,12 @@ impl Drop for EnvironmentBuilder<'_, '_> {
                 if let Some((tile, entity)) = opt {
                     self.components.sprites.insert(
                         entity,
-                        self.env
-                            .sheet
-                            .get(match tile {
-                                Tile::Bridge => self.env.get_bridge_sprite_number(x, y),
-                                Tile::Solid => self.env.get_solid_sprite_number(x, y),
-                                Tile::Grass => self.env.get_grass_sprite_number(x, y),
-                                Tile::Spike => self.env.get_spike_sprite_number(x, y),
-                            })
-                            .unwrap(),
+                        self.env.sheet.get(match tile {
+                            Tile::Bridge => self.env.get_bridge_sprite_number(x, y),
+                            Tile::Solid => self.env.get_solid_sprite_number(x, y),
+                            Tile::Grass => self.env.get_grass_sprite_number(x, y),
+                            Tile::Spike => self.env.get_spike_sprite_number(x, y),
+                        }),
                     );
                 }
             }

@@ -17,8 +17,12 @@ impl SpriteSheet {
         SpriteSheetBuilder::new(ctx, path)
     }
 
-    pub fn get(&self, idx: usize) -> Option<Sprite> {
-        self.sprites.get(idx).cloned()
+    pub fn count(&self) -> usize {
+        self.sprites.len()
+    }
+
+    pub fn get(&self, idx: usize) -> Sprite {
+        self.sprites[idx].clone()
     }
 }
 

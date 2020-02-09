@@ -236,7 +236,7 @@ dependencies = [
 [[package]]
 name = "crow_ecs"
 version = "0.1.0"
-source = "git+https://github.com/lcnr/crow_ecs#cf0f05eb7de0fd5cefbc897f41b1434dc19b66e0"
+source = "git+https://github.com/lcnr/crow_ecs#6010c2d2f413c13fc01ec075b43109852fe27358"
 
 [[package]]
 name = "deflate"
