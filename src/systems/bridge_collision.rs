@@ -1,4 +1,4 @@
-use crow_ecs::Storage;
+use crow_ecs::{SparseStorage, Storage};
 
 use crate::data::{Collider, Collision, Collisions, IgnoreBridges, Position};
 
@@ -10,7 +10,7 @@ impl BridgeCollisionSystem {
         positions: &Storage<Position>,
         previous_positions: &Storage<Position>,
         colliders: &Storage<Collider>,
-        ignore_bridges: &Storage<IgnoreBridges>,
+        ignore_bridges: &SparseStorage<IgnoreBridges>,
         collisions: &mut Collisions,
     ) {
         #[cfg(feature = "profiler")]

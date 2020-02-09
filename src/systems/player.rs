@@ -1,4 +1,4 @@
-use crow_ecs::{Entities, Entity, Joinable, Storage};
+use crow_ecs::{Entities, Entity, Joinable, SparseStorage};
 
 use crate::{
     data::{Collision, Collisions, Components, Grounded, IgnoreBridges, PlayerState, Velocity},
@@ -116,9 +116,10 @@ fn initialize_state(
     state: PlayerState,
     player: Entity,
     velocity: &mut Velocity,
-    ignore_bridges: &mut Storage<IgnoreBridges>,
+    ignore_bridges: &mut SparseStorage<IgnoreBridges>,
     r: &mut Ressources,
 ) {
+    println!("Updating state to {:?}", state);
     match state {
         PlayerState::Jumping => {
             velocity.y = r.config.player.jump_speed;

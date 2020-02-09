@@ -5,7 +5,7 @@ use std::{
 
 use crow::Texture;
 
-use crow_ecs::{Entity, Storage};
+use crow_ecs::{Entity, SparseStorage, Storage};
 
 #[derive(Default)]
 pub struct Components {
@@ -19,8 +19,8 @@ pub struct Components {
     pub grounded: Storage<Grounded>,
     pub wall_collisions: Storage<WallCollision>,
     pub gravity: Storage<Gravity>,
-    pub ignore_bridges: Storage<IgnoreBridges>,
-    pub player_state: Storage<PlayerState>,
+    pub ignore_bridges: SparseStorage<IgnoreBridges>,
+    pub player_state: SparseStorage<PlayerState>,
     pub depths: Storage<Depth>,
 }
 
@@ -100,7 +100,6 @@ pub enum Depth {
     Background,
     Bridges,
     Grass,
-    Unspecified,
     Player,
     Tiles,
     EditorSelection,
@@ -110,14 +109,13 @@ pub enum Depth {
 impl From<Depth> for f32 {
     fn from(depth: Depth) -> f32 {
         match depth {
-            Depth::Background => -1.0,
-            Depth::Bridges => -0.2,
-            Depth::Grass => -0.1,
-            Depth::Unspecified => 0.0,
-            Depth::Player => 0.1,
-            Depth::Tiles => 0.2,
-            Depth::EditorSelection => 0.3,
-            Depth::Particles => 0.4,
+            Depth::Background => 0.9,
+            Depth::Bridges => 0.8,
+            Depth::Grass => 0.8,
+            Depth::Player => 0.6,
+            Depth::Tiles => 0.5,
+            Depth::EditorSelection => 0.4,
+            Depth::Particles => 0.3,
         }
     }
 }

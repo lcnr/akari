@@ -76,7 +76,7 @@ fn main() -> Result<(), crow::Error> {
         }
     };
 
-    let env = environment::Environment::load(&mut ctx, &mut c, &config)?;
+    let _e = environment::Environment::load(&mut ctx, &mut c, &config)?;
 
     loop {
         #[cfg(feature = "profiler")]
@@ -87,6 +87,7 @@ fn main() -> Result<(), crow::Error> {
         }
 
         ctx.clear_color(&mut screen_buffer, (0.3, 0.3, 0.8, 1.0))?;
+        screen_buffer.clear_depth(&mut ctx)?;
 
         s.input_buffer.run(
             r.input_state.events(),
@@ -129,7 +130,13 @@ fn main() -> Result<(), crow::Error> {
         // destruction timer
 
         // animation system
-        draw::scene(&mut ctx, &mut screen_buffer, &c.positions, &c.sprites)?;
+        draw::scene(
+            &mut ctx,
+            &mut screen_buffer,
+            &c.positions,
+            &c.sprites,
+            &c.depths,
+        )?;
         draw::debug_colliders(&mut ctx, &mut screen_buffer, &c.positions, &c.colliders)?;
         ctx.draw(
             &mut surface,
