@@ -2,6 +2,10 @@
 
 A showcase game for the `crow` engine, currently work in progress.
 
+Both the code and all the art in this repository is licensed under the [MIT license].
+
+[MIT license]: ./LICENSE
+
 ## Design
 
 A high intensity 2D hack and slay platformer with a large focus on dodging attacks.

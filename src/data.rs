@@ -3,6 +3,8 @@ use std::{
     ops::{BitAnd, Mul, Sub},
 };
 
+use crow::Texture;
+
 use crow_ecs::{Entity, Storage};
 
 #[derive(Default)]
@@ -10,6 +12,7 @@ pub struct Components {
     pub count: usize,
     pub deleted: Vec<Entity>,
     pub positions: Storage<Position>,
+    pub sprites: Storage<Sprite>,
     pub previous_positions: Storage<Position>,
     pub velocities: Storage<Velocity>,
     pub colliders: Storage<Collider>,
@@ -39,6 +42,7 @@ impl Components {
     pub fn delete_entity(&mut self, e: Entity) {
         self.deleted.push(e);
         self.positions.remove(e);
+        self.sprites.remove(e);
         self.previous_positions.remove(e);
         self.velocities.remove(e);
         self.colliders.remove(e);
@@ -55,6 +59,12 @@ impl Components {
 pub struct Position {
     pub x: f32,
     pub y: f32,
+}
+
+#[derive(Debug, Clone)]
+pub struct Sprite {
+    pub texture: Texture,
+    pub offset: (i32, i32),
 }
 
 #[derive(Debug, Clone, Copy, Default)]

@@ -1,16 +1,20 @@
-#![allow(dead_code)]
+use std::path::Path;
 
 use serde::{Deserialize, Serialize};
+
+use crow::{Context, LoadTextureError};
 
 use crow_ecs::Entity;
 
 use crate::{
     data::{Collider, ColliderType, Components, Depth, Position},
+    spritesheet::SpriteSheet,
     ARENA_HEIGHT, ARENA_WIDTH,
 };
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct EnvironmentConfig {
+    pub spritesheet: String,
     pub tiles: [[Option<Tile>; ARENA_WIDTH]; ARENA_HEIGHT],
 }
 
@@ -41,6 +45,7 @@ impl Tile {
 
 #[derive(Debug, Clone)]
 pub struct Environment {
+    pub sheet: SpriteSheet,
     pub tiles: [[Option<(Tile, Entity)>; ARENA_WIDTH]; ARENA_HEIGHT],
 }
 
@@ -115,8 +120,18 @@ impl Drop for EnvironmentBuilder<'_, '_> {
         for (y, row) in self.env.tiles.iter().enumerate() {
             for (x, opt) in row.iter().copied().enumerate() {
                 if let Some((tile, entity)) = opt {
-                    // select sprite number
-                    let _ = (y, x, tile, entity);
+                    self.components.sprites.insert(
+                        entity,
+                        self.env
+                            .sheet
+                            .get(match tile {
+                                Tile::Bridge => self.env.get_bridge_sprite_number(x, y),
+                                Tile::Solid => self.env.get_solid_sprite_number(x, y),
+                                Tile::Grass => self.env.get_grass_sprite_number(x, y),
+                                Tile::Spike => self.env.get_spike_sprite_number(x, y),
+                            })
+                            .unwrap(),
+                    );
                 }
             }
         }
@@ -124,10 +139,28 @@ impl Drop for EnvironmentBuilder<'_, '_> {
 }
 
 impl Environment {
-    pub fn new() -> Self {
-        Environment {
-            tiles: Default::default(),
+    pub fn new<P: AsRef<Path>>(ctx: &mut Context, path: P) -> Result<Self, LoadTextureError> {
+        let mut builder = SpriteSheet::build(ctx, path)?;
+
+        let mut y = builder.texture.height();
+        let mut x = 0;
+        for _ in 0..58 {
+            if x == 0 {
+                y -= 20;
+            }
+
+            builder.add_sprite((x, y), (20, 20), (0, 0));
+
+            x += 20;
+            if x >= builder.texture.width() {
+                x = 0;
+            }
         }
+
+        Ok(Environment {
+            sheet: builder.finish(),
+            tiles: Default::default(),
+        })
     }
 
     pub fn modify<'a, 'b>(
@@ -251,8 +284,12 @@ impl Environment {
         }
     }
 
-    pub fn load(components: &mut Components, config: &EnvironmentConfig) -> Self {
-        let mut env = Environment::new();
+    pub fn load(
+        ctx: &mut Context,
+        components: &mut Components,
+        config: &EnvironmentConfig,
+    ) -> Result<Self, LoadTextureError> {
+        let mut env = Environment::new(ctx, &config.spritesheet)?;
         {
             let mut builder = env.modify(components);
 
@@ -265,6 +302,6 @@ impl Environment {
             }
         }
 
-        env
+        Ok(env)
     }
 }

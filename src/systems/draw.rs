@@ -1,8 +1,32 @@
-use crow::{Context, DrawTarget};
+use crow::{Context, DrawConfig, DrawTarget};
 
 use crow_ecs::{Joinable, Storage};
 
-use crate::data::{Collider, ColliderType, Position};
+use crate::data::{Collider, ColliderType, Position, Sprite};
+
+pub fn scene<T: DrawTarget>(
+    ctx: &mut Context,
+    target: &mut T,
+    positions: &Storage<Position>,
+    sprites: &Storage<Sprite>,
+) -> Result<(), crow::Error> {
+    #[cfg(feature = "profiler")]
+    profile_scope!("scene");
+
+    for (&Position { x, y }, sprite) in (positions, sprites).join() {
+        ctx.draw(
+            target,
+            &sprite.texture,
+            (
+                x.round() as i32 - sprite.offset.0,
+                y.round() as i32 - sprite.offset.1,
+            ),
+            &DrawConfig::default(),
+        )?;
+    }
+
+    Ok(())
+}
 
 pub fn debug_colliders<T: DrawTarget>(
     ctx: &mut Context,

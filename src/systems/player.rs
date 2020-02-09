@@ -126,6 +126,7 @@ fn initialize_state(
         PlayerState::Dying => {
             // prevent the player from sliding of falling through bridges
             // while still falling to the ground
+            velocity.y = velocity.y.min(0.0);
             velocity.x = 0.0;
             ignore_bridges.remove(player);
         }

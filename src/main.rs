@@ -11,7 +11,7 @@ extern crate log;
 
 use crow::{
     glutin::{EventsLoop, WindowBuilder},
-    Context,
+    Context, DrawConfig, Texture,
 };
 
 pub mod data;
@@ -19,6 +19,7 @@ pub mod environment;
 pub mod input;
 pub mod physics;
 pub mod ressources;
+pub mod spritesheet;
 pub mod systems;
 pub mod time;
 
@@ -27,6 +28,7 @@ use systems::*;
 const ARENA_WIDTH: usize = 16;
 const ARENA_HEIGHT: usize = 12;
 const GAME_SIZE: (u32, u32) = (20 * ARENA_WIDTH as u32, 20 * ARENA_HEIGHT as u32);
+const WINDOW_SCALE: u32 = 3;
 const FPS: u32 = 60;
 
 fn main() -> Result<(), crow::Error> {
@@ -34,10 +36,14 @@ fn main() -> Result<(), crow::Error> {
     thread_profiler::register_thread_with_profiler();
 
     let mut ctx = Context::new(
-        WindowBuilder::new().with_dimensions(From::from(GAME_SIZE)),
+        WindowBuilder::new().with_dimensions(From::from((
+            GAME_SIZE.0 * WINDOW_SCALE,
+            GAME_SIZE.1 * WINDOW_SCALE,
+        ))),
         EventsLoop::new(),
     )?;
     let mut surface = ctx.window_surface();
+    let mut screen_buffer = Texture::new(&mut ctx, GAME_SIZE)?;
 
     let mut c = data::Components::new();
     let mut r = ressources::Ressources::new(FPS);
@@ -60,7 +66,7 @@ fn main() -> Result<(), crow::Error> {
     c.gravity.insert(player, data::Gravity);
     c.player_state.insert(player, data::PlayerState::Idle);
 
-    let f = std::fs::File::open("ressources/environment.rs").expect("Failed opening file");
+    let f = std::fs::File::open("ressources/environment.ron").expect("Failed opening file");
     let config: environment::EnvironmentConfig = match ron::de::from_reader(f) {
         Ok(x) => x,
         Err(e) => {
@@ -70,7 +76,7 @@ fn main() -> Result<(), crow::Error> {
         }
     };
 
-    let env = environment::Environment::load(&mut c, &config);
+    let env = environment::Environment::load(&mut ctx, &mut c, &config)?;
 
     loop {
         #[cfg(feature = "profiler")]
@@ -80,7 +86,7 @@ fn main() -> Result<(), crow::Error> {
             break;
         }
 
-        ctx.clear_color(&mut surface, (0.3, 0.3, 0.8, 1.0))?;
+        ctx.clear_color(&mut screen_buffer, (0.3, 0.3, 0.8, 1.0))?;
 
         s.input_buffer.run(
             r.input_state.events(),
@@ -123,8 +129,17 @@ fn main() -> Result<(), crow::Error> {
         // destruction timer
 
         // animation system
-
-        draw::debug_colliders(&mut ctx, &mut surface, &c.positions, &c.colliders)?;
+        draw::scene(&mut ctx, &mut screen_buffer, &c.positions, &c.sprites)?;
+        draw::debug_colliders(&mut ctx, &mut screen_buffer, &c.positions, &c.colliders)?;
+        ctx.draw(
+            &mut surface,
+            &screen_buffer,
+            (0, 0),
+            &DrawConfig {
+                scale: (WINDOW_SCALE, WINDOW_SCALE),
+                ..Default::default()
+            },
+        )?;
         ctx.finalize_frame()?;
         r.time.frame();
     }
