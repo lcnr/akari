@@ -108,7 +108,7 @@ impl PlayerStateMachine {
                 PlayerState::Airborne | PlayerState::Dying | PlayerState::Dead => false,
             } {
                 velocity.y = r.config.player.jump_speed;
-                *animation = r.animation_storage.start(player_animations.jump);
+                *animation = r.animation_storage.start(player_animations.on_jump);
 
                 *state = PlayerState::Airborne;
             }
@@ -122,6 +122,12 @@ impl PlayerStateMachine {
                     }
                 }
                 PlayerState::Dying | PlayerState::Dead => (),
+            }
+
+            if *state == PlayerState::Airborne && velocity.y.is_sign_negative() {
+                if animation.current == player_animations.jumping {
+                    *animation = r.animation_storage.start(player_animations.start_falling);
+                }
             }
         }
     }
@@ -141,7 +147,7 @@ fn initialize_state(
             *animation = animation_storage.start(player_animations.idle);
         }
         PlayerState::Airborne => {
-            // TODO: falling animation
+            *animation = animation_storage.start(player_animations.start_falling);
             // jumping is handled directly after `maybe_jump`
         }
         PlayerState::Dying => {

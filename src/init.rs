@@ -3,12 +3,13 @@ use crow::Context;
 use crow_anim::Animation;
 
 use crate::{
+    config::SpriteSheetConfig,
     data::{
         Collider, ColliderType, Components, Depth, Gravity, PlayerAnimations, PlayerState,
         Position, Velocity,
     },
     ressources::Ressources,
-    spritesheet::{SpriteSheet, SpriteSheetConfig},
+    spritesheet::SpriteSheet,
 };
 
 pub fn player(
@@ -45,22 +46,65 @@ pub fn player(
     let idle = r.animation_storage.insert(idle_animation);
     r.animation_storage.get_mut(idle).next = idle;
 
-    let jump_sheet = SpriteSheet::from_config(
+    let jumping_sheet = SpriteSheet::from_config(
         ctx,
-        &SpriteSheetConfig::load("ressources/player/jump_sheet.ron").unwrap(),
+        &SpriteSheetConfig::load("ressources/player/jumping_sheet.ron").unwrap(),
     )?;
-    let mut jump_animation = Animation::empty();
-    for s in jump_sheet.iter() {
-        for _ in 0..5 {
-            jump_animation.frames.push(s.clone());
+    let mut jumping_animation = Animation::empty();
+    for s in jumping_sheet.iter() {
+        jumping_animation.frames.push(s.clone());
+    }
+    let jumping = r.animation_storage.insert(jumping_animation);
+    r.animation_storage.get_mut(jumping).next = jumping;
+
+    let on_jump_sheet = SpriteSheet::from_config(
+        ctx,
+        &SpriteSheetConfig::load("ressources/player/on_jump_sheet.ron").unwrap(),
+    )?;
+    let mut on_jump_animation = Animation::empty();
+    for s in on_jump_sheet.iter() {
+        for _ in 0..4 {
+            on_jump_animation.frames.push(s.clone());
         }
     }
-    let jump = r.animation_storage.insert(jump_animation);
-    r.animation_storage.get_mut(jump).next = idle;
+    let on_jump = r.animation_storage.insert(on_jump_animation);
+    r.animation_storage.get_mut(on_jump).next = jumping;
+
+    let falling_sheet = SpriteSheet::from_config(
+        ctx,
+        &SpriteSheetConfig::load("ressources/player/falling_sheet.ron").unwrap(),
+    )?;
+    let mut falling_animation = Animation::empty();
+    for s in falling_sheet.iter() {
+        falling_animation.frames.push(s.clone());
+    }
+    let falling = r.animation_storage.insert(falling_animation);
+    r.animation_storage.get_mut(falling).next = falling;
+
+    let start_falling_sheet = SpriteSheet::from_config(
+        ctx,
+        &SpriteSheetConfig::load("ressources/player/start_falling_sheet.ron").unwrap(),
+    )?;
+    let mut start_falling_animation = Animation::empty();
+    for s in start_falling_sheet.iter() {
+        for _ in 0..4 {
+            start_falling_animation.frames.push(s.clone());
+        }
+    }
+    let start_falling = r.animation_storage.insert(start_falling_animation);
+    r.animation_storage.get_mut(start_falling).next = falling;
 
     c.depths.insert(player, Depth::Player);
-    c.player_animations
-        .insert(player, PlayerAnimations { idle, jump });
+    c.player_animations.insert(
+        player,
+        PlayerAnimations {
+            idle,
+            on_jump,
+            jumping,
+            start_falling,
+            falling,
+        },
+    );
     c.animations.insert(player, r.animation_storage.start(idle));
 
     Ok(())

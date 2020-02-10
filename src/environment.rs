@@ -1,4 +1,4 @@
-use std::{fs::File, path::Path};
+use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
@@ -7,23 +7,11 @@ use crow::{Context, LoadTextureError};
 use crow_ecs::Entity;
 
 use crate::{
+    config::EnvironmentConfig,
     data::{Collider, ColliderType, Components, Depth, Position},
     spritesheet::SpriteSheet,
-    LoadError, ARENA_HEIGHT, ARENA_WIDTH,
+    ARENA_HEIGHT, ARENA_WIDTH,
 };
-
-#[derive(Default, Debug, Clone, Serialize, Deserialize)]
-pub struct EnvironmentConfig {
-    pub spritesheet: String,
-    pub tiles: [[Option<Tile>; ARENA_WIDTH]; ARENA_HEIGHT],
-}
-
-impl EnvironmentConfig {
-    pub fn load<P: AsRef<Path>>(path: P) -> Result<Self, LoadError> {
-        let f = File::open(path)?;
-        Ok(ron::de::from_reader(f)?)
-    }
-}
 
 #[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum Tile {

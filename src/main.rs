@@ -9,13 +9,12 @@ extern crate thread_profiler;
 #[macro_use]
 extern crate log;
 
-use std::io;
-
 use crow::{
     glutin::{EventsLoop, WindowBuilder},
     Context, DrawConfig, Texture,
 };
 
+pub mod config;
 pub mod data;
 pub mod environment;
 pub mod init;
@@ -52,7 +51,7 @@ fn main() -> Result<(), crow::Error> {
     let mut r = ressources::Ressources::new(FPS);
     let mut s = Systems::new();
 
-    let config = environment::EnvironmentConfig::load("ressources/environment.ron").unwrap();
+    let config = config::EnvironmentConfig::load("ressources/environment.ron").unwrap();
 
     init::player(&mut ctx, &mut c, &mut r)?;
 
@@ -119,7 +118,7 @@ fn main() -> Result<(), crow::Error> {
             &c.sprites,
             &c.depths,
         )?;
-        draw::debug_colliders(&mut ctx, &mut screen_buffer, &c.positions, &c.colliders)?;
+        //draw::debug_colliders(&mut ctx, &mut screen_buffer, &c.positions, &c.colliders)?;
 
         ctx.draw(
             &mut surface,
@@ -137,22 +136,4 @@ fn main() -> Result<(), crow::Error> {
     #[cfg(feature = "profiler")]
     thread_profiler::write_profile("profile.json");
     Ok(())
-}
-
-#[derive(Debug)]
-pub enum LoadError {
-    IoError(io::Error),
-    DeserializeError(ron::de::Error),
-}
-
-impl From<io::Error> for LoadError {
-    fn from(err: io::Error) -> Self {
-        LoadError::IoError(err)
-    }
-}
-
-impl From<ron::de::Error> for LoadError {
-    fn from(err: ron::de::Error) -> Self {
-        LoadError::DeserializeError(err)
-    }
 }

@@ -128,7 +128,12 @@ pub enum PlayerState {
 
 pub struct PlayerAnimations {
     pub idle: AnimationHandle,
-    pub jump: AnimationHandle,
+    /// run once after jumping -> jumping
+    pub on_jump: AnimationHandle,
+    pub jumping: AnimationHandle,
+    /// run once during a jump/fall -> falling,
+    pub start_falling: AnimationHandle,
+    pub falling: AnimationHandle,
 }
 
 #[derive(Debug, Clone, Copy)]

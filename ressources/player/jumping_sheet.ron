@@ -1,0 +1,10 @@
+(
+    image_path: "textures/player/jump_fall.png",
+    sprites: [
+        (
+            position: (480, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+    ],
+)

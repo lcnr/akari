@@ -31,5 +31,36 @@
             size: (32, 32),
             offset: (13, 7),
         ),
+        (
+            position: (352, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (320, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (352, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (384, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (416, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+
+        (
+            position: (448, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
     ],
 )

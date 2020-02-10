@@ -1,32 +1,10 @@
 use std::path::Path;
 
-use serde::{Deserialize, Serialize};
-
 use crow::{Context, LoadTextureError, Texture};
 
 use crow_anim::Sprite;
 
-use crate::LoadError;
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SpriteConfig {
-    pub position: (u32, u32),
-    pub size: (u32, u32),
-    pub offset: (i32, i32),
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SpriteSheetConfig {
-    pub image_path: String,
-    pub sprites: Vec<SpriteConfig>,
-}
-
-impl SpriteSheetConfig {
-    pub fn load<P: AsRef<Path>>(path: P) -> Result<Self, LoadError> {
-        let f = std::fs::File::open(path)?;
-        Ok(ron::de::from_reader(f)?)
-    }
-}
+use crate::config::SpriteSheetConfig;
 
 #[derive(Debug, Clone)]
 pub struct SpriteSheet {
