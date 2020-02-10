@@ -3,7 +3,7 @@ use crow::Context;
 use crow_anim::Animation;
 
 use crate::{
-    config::SpriteSheetConfig,
+    config::{Config, SpriteSheetConfig},
     data::{
         Collider, ColliderType, Components, Depth, Gravity, PlayerAnimations, PlayerState,
         Position, Velocity,

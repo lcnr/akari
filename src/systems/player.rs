@@ -124,10 +124,11 @@ impl PlayerStateMachine {
                 PlayerState::Dying | PlayerState::Dead => (),
             }
 
-            if *state == PlayerState::Airborne && velocity.y.is_sign_negative() {
-                if animation.current == player_animations.jumping {
-                    *animation = r.animation_storage.start(player_animations.start_falling);
-                }
+            if *state == PlayerState::Airborne
+                && velocity.y.is_sign_negative()
+                && animation.current == player_animations.jumping
+            {
+                *animation = r.animation_storage.start(player_animations.start_falling);
             }
         }
     }

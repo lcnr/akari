@@ -25,7 +25,12 @@ pub mod spritesheet;
 pub mod systems;
 pub mod time;
 
-use systems::*;
+use crate::{
+    config::Config,
+    data::Components,
+    ressources::Ressources,
+    systems::{draw, Systems},
+};
 
 const ARENA_WIDTH: usize = 16;
 const ARENA_HEIGHT: usize = 12;
@@ -47,8 +52,8 @@ fn main() -> Result<(), crow::Error> {
     let mut surface = ctx.window_surface();
     let mut screen_buffer = Texture::new(&mut ctx, GAME_SIZE)?;
 
-    let mut c = data::Components::new();
-    let mut r = ressources::Ressources::new(FPS);
+    let mut c = Components::new();
+    let mut r = Ressources::new(FPS);
     let mut s = Systems::new();
 
     let config = config::EnvironmentConfig::load("ressources/environment.ron").unwrap();
