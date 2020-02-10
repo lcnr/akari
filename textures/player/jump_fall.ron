@@ -2,6 +2,26 @@
     image_path: "textures/player/jump_fall.png",
     sprites: [
         (
+            position: (0, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (32, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (64, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (96, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
             position: (128, 0),
             size: (32, 32),
             offset: (13, 7),
@@ -63,6 +83,36 @@
         ),
         (
             position: (480, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+         (
+            position: (512, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (544, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (576, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (608, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (640, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (672, 0),
             size: (32, 32),
             offset: (13, 7),
         ),

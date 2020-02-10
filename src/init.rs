@@ -1,15 +1,12 @@
 use crow::Context;
 
-use crow_anim::Animation;
-
 use crate::{
-    config::{Config, SpriteSheetConfig},
+    config::{Config, PlayerAnimationsConfig},
     data::{
         Collider, ColliderType, Components, Depth, Gravity, PlayerAnimations, PlayerState,
         Position, Velocity,
     },
     ressources::Ressources,
-    spritesheet::SpriteSheet,
 };
 
 pub fn player(
@@ -32,68 +29,17 @@ pub fn player(
     c.velocities.insert(player, Velocity { x: 0.0, y: 0.0 });
     c.gravity.insert(player, Gravity);
     c.player_state.insert(player, PlayerState::Grounded);
-
-    let idle_sheet = SpriteSheet::from_config(
-        ctx,
-        &SpriteSheetConfig::load("ressources/player/idle_sheet.ron").unwrap(),
-    )?;
-    let mut idle_animation = Animation::empty();
-    for s in idle_sheet.iter() {
-        for _ in 0..10 {
-            idle_animation.frames.push(s.clone());
-        }
-    }
-    let idle = r.animation_storage.insert(idle_animation);
-    r.animation_storage.get_mut(idle).next = idle;
-
-    let falling_sheet = SpriteSheet::from_config(
-        ctx,
-        &SpriteSheetConfig::load("ressources/player/falling_sheet.ron").unwrap(),
-    )?;
-    let mut falling_animation = Animation::empty();
-    for s in falling_sheet.iter() {
-        falling_animation.frames.push(s.clone());
-    }
-    let falling = r.animation_storage.insert(falling_animation);
-    r.animation_storage.get_mut(falling).next = falling;
-
-    let jumping_sheet = SpriteSheet::from_config(
-        ctx,
-        &SpriteSheetConfig::load("ressources/player/jumping_sheet.ron").unwrap(),
-    )?;
-    let mut jumping_animation = Animation::empty();
-    for s in jumping_sheet.iter() {
-        for _ in 0..4 {
-            jumping_animation.frames.push(s.clone());
-        }
-    }
-    let jumping = r.animation_storage.insert(jumping_animation);
-    r.animation_storage.get_mut(jumping).next = falling;
-
-    let start_falling_sheet = SpriteSheet::from_config(
-        ctx,
-        &SpriteSheetConfig::load("ressources/player/start_falling_sheet.ron").unwrap(),
-    )?;
-    let mut start_falling_animation = Animation::empty();
-    for s in start_falling_sheet.iter() {
-        for _ in 0..4 {
-            start_falling_animation.frames.push(s.clone());
-        }
-    }
-    let start_falling = r.animation_storage.insert(start_falling_animation);
-    r.animation_storage.get_mut(start_falling).next = falling;
-
     c.depths.insert(player, Depth::Player);
-    c.player_animations.insert(
-        player,
-        PlayerAnimations {
-            idle,
-            jumping,
-            start_falling,
-            falling,
-        },
-    );
-    c.animations.insert(player, r.animation_storage.start(idle));
+
+    let player_animations = PlayerAnimations::from_config(
+        ctx,
+        &mut r.animation_storage,
+        PlayerAnimationsConfig::load("ressources/player/animations.ron").unwrap(),
+    )?;
+
+    c.animations
+        .insert(player, r.animation_storage.start(player_animations.idle));
+    c.player_animations.insert(player, player_animations);
 
     Ok(())
 }
