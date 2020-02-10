@@ -108,7 +108,7 @@ impl PlayerStateMachine {
                 PlayerState::Airborne | PlayerState::Dying | PlayerState::Dead => false,
             } {
                 velocity.y = r.config.player.jump_speed;
-                *animation = r.animation_storage.start(player_animations.on_jump);
+                *animation = r.animation_storage.start(player_animations.jumping);
 
                 *state = PlayerState::Airborne;
             }

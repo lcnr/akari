@@ -46,30 +46,6 @@ pub fn player(
     let idle = r.animation_storage.insert(idle_animation);
     r.animation_storage.get_mut(idle).next = idle;
 
-    let jumping_sheet = SpriteSheet::from_config(
-        ctx,
-        &SpriteSheetConfig::load("ressources/player/jumping_sheet.ron").unwrap(),
-    )?;
-    let mut jumping_animation = Animation::empty();
-    for s in jumping_sheet.iter() {
-        jumping_animation.frames.push(s.clone());
-    }
-    let jumping = r.animation_storage.insert(jumping_animation);
-    r.animation_storage.get_mut(jumping).next = jumping;
-
-    let on_jump_sheet = SpriteSheet::from_config(
-        ctx,
-        &SpriteSheetConfig::load("ressources/player/on_jump_sheet.ron").unwrap(),
-    )?;
-    let mut on_jump_animation = Animation::empty();
-    for s in on_jump_sheet.iter() {
-        for _ in 0..4 {
-            on_jump_animation.frames.push(s.clone());
-        }
-    }
-    let on_jump = r.animation_storage.insert(on_jump_animation);
-    r.animation_storage.get_mut(on_jump).next = jumping;
-
     let falling_sheet = SpriteSheet::from_config(
         ctx,
         &SpriteSheetConfig::load("ressources/player/falling_sheet.ron").unwrap(),
@@ -80,6 +56,19 @@ pub fn player(
     }
     let falling = r.animation_storage.insert(falling_animation);
     r.animation_storage.get_mut(falling).next = falling;
+
+    let jumping_sheet = SpriteSheet::from_config(
+        ctx,
+        &SpriteSheetConfig::load("ressources/player/jumping_sheet.ron").unwrap(),
+    )?;
+    let mut jumping_animation = Animation::empty();
+    for s in jumping_sheet.iter() {
+        for _ in 0..4 {
+            jumping_animation.frames.push(s.clone());
+        }
+    }
+    let jumping = r.animation_storage.insert(jumping_animation);
+    r.animation_storage.get_mut(jumping).next = falling;
 
     let start_falling_sheet = SpriteSheet::from_config(
         ctx,
@@ -99,7 +88,6 @@ pub fn player(
         player,
         PlayerAnimations {
             idle,
-            on_jump,
             jumping,
             start_falling,
             falling,

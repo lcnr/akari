@@ -128,8 +128,7 @@ pub enum PlayerState {
 
 pub struct PlayerAnimations {
     pub idle: AnimationHandle,
-    /// run once after jumping -> jumping
-    pub on_jump: AnimationHandle,
+    /// run once after jumping -> falling,
     pub jumping: AnimationHandle,
     /// run once during a jump/fall -> falling,
     pub start_falling: AnimationHandle,
