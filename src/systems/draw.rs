@@ -2,7 +2,9 @@ use crow::{Context, DrawConfig, DrawTarget};
 
 use crow_ecs::{Joinable, Storage};
 
-use crate::data::{Collider, ColliderType, Depth, Position, Sprite};
+use crow_anim::Sprite;
+
+use crate::data::{Collider, ColliderType, Depth, Position};
 
 pub fn scene<T: DrawTarget>(
     ctx: &mut Context,
@@ -43,7 +45,7 @@ pub fn debug_colliders<T: DrawTarget>(
 
     for (&Position { x, y }, collider) in (positions, colliders).join() {
         let color = match collider.ty {
-            ColliderType::Player => (0.0, 1.0, 0.0, 0.8),
+            ColliderType::Player => (0.0, 1.0, 0.0, 0.4),
             ColliderType::PlayerDamage => (1.0, 0.0, 0.0, 0.8),
             ColliderType::Environment => (0.0, 0.7, 0.7, 0.8),
             ColliderType::Bridge => (0.0, 0.0, 1.0, 0.8),
@@ -55,9 +57,9 @@ pub fn debug_colliders<T: DrawTarget>(
         let y = y.round() as i32;
 
         ctx.draw_line(target, (x, y), (xw, y), color)?;
-        ctx.draw_line(target, (xw, y), (xw, yh), color)?;
-        ctx.draw_line(target, (xw, yh), (x, yh), color)?;
-        ctx.draw_line(target, (x, yh), (x, y), color)?;
+        ctx.draw_line(target, (xw - 1, y), (xw - 1, yh), color)?;
+        ctx.draw_line(target, (xw - 1, yh - 1), (x, yh - 1), color)?;
+        ctx.draw_line(target, (x, yh - 1), (x, y), color)?;
     }
 
     Ok(())

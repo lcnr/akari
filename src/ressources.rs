@@ -1,12 +1,16 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{input::InputState, time::Time};
+use crow_anim::AnimationStorage;
+
+use crate::{data::Components, input::InputState, time::Time};
 
 pub struct Ressources {
     pub input_state: InputState,
     pub time: Time,
     pub config: Config,
     pub pressed_space: Option<JumpBuffer>,
+    pub animation_storage: AnimationStorage,
+    pub lazy_update: Vec<Box<dyn FnOnce(&mut Components, &mut Ressources)>>,
 }
 
 #[derive(Debug, Default, Serialize, Deserialize)]
@@ -23,6 +27,8 @@ impl Ressources {
             time: Time::new(fps),
             config: Default::default(),
             pressed_space: None,
+            animation_storage: AnimationStorage::new(),
+            lazy_update: Vec::new(),
         }
     }
 }

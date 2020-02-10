@@ -42,42 +42,43 @@ impl InputState {
         self.events.clear();
         let mut fin = false;
 
-        events_loop.poll_events(|e| match e {
-            Event::WindowEvent { event, .. } => match event {
-                WindowEvent::CloseRequested => fin = true,
-                WindowEvent::KeyboardInput {
-                    input:
-                        KeyboardInput {
-                            virtual_keycode: Some(key),
-                            state: ElementState::Pressed,
-                            ..
-                        },
-                    ..
-                } => match key {
-                    Key::Space => self.events.push(InputEvent::ButtonDown(Button::Space)),
-                    Key::S => self.down = ButtonState::Down,
-                    Key::A => self.left = ButtonState::Down,
-                    Key::D => self.right = ButtonState::Down,
+        events_loop.poll_events(|e| {
+            if let Event::WindowEvent { event, .. } = e {
+                match event {
+                    WindowEvent::CloseRequested => fin = true,
+                    WindowEvent::KeyboardInput {
+                        input:
+                            KeyboardInput {
+                                virtual_keycode: Some(key),
+                                state: ElementState::Pressed,
+                                ..
+                            },
+                        ..
+                    } => match key {
+                        Key::Space => self.events.push(InputEvent::ButtonDown(Button::Space)),
+                        Key::S => self.down = ButtonState::Down,
+                        Key::A => self.left = ButtonState::Down,
+                        Key::D => self.right = ButtonState::Down,
+                        _ => (),
+                    },
+                    WindowEvent::KeyboardInput {
+                        input:
+                            KeyboardInput {
+                                virtual_keycode: Some(key),
+                                state: ElementState::Released,
+                                ..
+                            },
+                        ..
+                    } => match key {
+                        Key::Space => self.events.push(InputEvent::ButtonUp(Button::Space)),
+                        Key::S => self.down = ButtonState::Up,
+                        Key::A => self.left = ButtonState::Up,
+                        Key::D => self.right = ButtonState::Up,
+                        _ => (),
+                    },
                     _ => (),
-                },
-                WindowEvent::KeyboardInput {
-                    input:
-                        KeyboardInput {
-                            virtual_keycode: Some(key),
-                            state: ElementState::Released,
-                            ..
-                        },
-                    ..
-                } => match key {
-                    Key::Space => self.events.push(InputEvent::ButtonUp(Button::Space)),
-                    Key::S => self.down = ButtonState::Up,
-                    Key::A => self.left = ButtonState::Up,
-                    Key::D => self.right = ButtonState::Up,
-                    _ => (),
-                },
-                _ => (),
-            },
-            _ => (),
+                }
+            }
         });
 
         fin

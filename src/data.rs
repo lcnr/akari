@@ -3,9 +3,9 @@ use std::{
     ops::{BitAnd, Mul, Sub},
 };
 
-use crow::Texture;
-
 use crow_ecs::{Entity, SparseStorage, Storage};
+
+use crow_anim::{AnimationHandle, AnimationState, Sprite};
 
 #[derive(Default)]
 pub struct Components {
@@ -13,6 +13,7 @@ pub struct Components {
     pub deleted: Vec<Entity>,
     pub positions: Storage<Position>,
     pub sprites: Storage<Sprite>,
+    pub animations: Storage<AnimationState>,
     pub previous_positions: Storage<Position>,
     pub velocities: Storage<Velocity>,
     pub colliders: Storage<Collider>,
@@ -21,6 +22,7 @@ pub struct Components {
     pub gravity: Storage<Gravity>,
     pub ignore_bridges: SparseStorage<IgnoreBridges>,
     pub player_state: SparseStorage<PlayerState>,
+    pub player_animations: SparseStorage<PlayerAnimations>,
     pub depths: Storage<Depth>,
 }
 
@@ -43,6 +45,7 @@ impl Components {
         self.deleted.push(e);
         self.positions.remove(e);
         self.sprites.remove(e);
+        self.animations.remove(e);
         self.previous_positions.remove(e);
         self.velocities.remove(e);
         self.colliders.remove(e);
@@ -51,6 +54,7 @@ impl Components {
         self.gravity.remove(e);
         self.ignore_bridges.remove(e);
         self.player_state.remove(e);
+        self.player_animations.remove(e);
         self.depths.remove(e);
     }
 }
@@ -59,12 +63,6 @@ impl Components {
 pub struct Position {
     pub x: f32,
     pub y: f32,
-}
-
-#[derive(Debug, Clone)]
-pub struct Sprite {
-    pub texture: Texture,
-    pub offset: (i32, i32),
 }
 
 #[derive(Debug, Clone, Copy, Default)]
@@ -109,37 +107,28 @@ pub enum Depth {
 impl From<Depth> for f32 {
     fn from(depth: Depth) -> f32 {
         match depth {
-            Depth::Background => 0.9,
-            Depth::Bridges => 0.8,
-            Depth::Grass => 0.8,
+            Depth::Background => 0.3,
+            Depth::Grass => 0.5,
             Depth::Player => 0.6,
-            Depth::Tiles => 0.5,
-            Depth::EditorSelection => 0.4,
-            Depth::Particles => 0.3,
+            Depth::Bridges => 0.7,
+            Depth::Tiles => 0.7,
+            Depth::EditorSelection => 0.8,
+            Depth::Particles => 0.9,
         }
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PlayerState {
-    Idle,
-    Walking,
-    Jumping,
-    Falling,
+    Grounded,
+    Airborne,
     Dying,
     Dead,
 }
 
-impl PlayerState {
-    pub fn is_grounded(self) -> bool {
-        match self {
-            PlayerState::Idle | PlayerState::Walking => true,
-            PlayerState::Jumping
-            | PlayerState::Falling
-            | PlayerState::Dying
-            | PlayerState::Dead => false,
-        }
-    }
+pub struct PlayerAnimations {
+    pub idle: AnimationHandle,
+    pub jump: AnimationHandle,
 }
 
 #[derive(Debug, Clone, Copy)]

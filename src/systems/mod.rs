@@ -1,3 +1,4 @@
+mod animation;
 mod bridge_collision;
 pub mod draw;
 mod fixed_collision;
@@ -6,6 +7,7 @@ mod input_buffer;
 mod physics;
 mod player;
 
+pub use animation::AnimationSystem;
 pub use bridge_collision::BridgeCollisionSystem;
 pub use fixed_collision::FixedCollisionSystem;
 pub use gravity::GravitySystem;
@@ -21,6 +23,7 @@ pub struct Systems {
     pub bridge_collision: BridgeCollisionSystem,
     pub fixed_collision: FixedCollisionSystem,
     pub player: PlayerStateMachine,
+    pub animation: AnimationSystem,
 }
 
 impl Default for Systems {
@@ -38,6 +41,7 @@ impl Systems {
             bridge_collision: BridgeCollisionSystem,
             fixed_collision: FixedCollisionSystem::new(),
             player: PlayerStateMachine,
+            animation: AnimationSystem,
         }
     }
 }

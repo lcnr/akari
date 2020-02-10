@@ -10,6 +10,7 @@ name = "akari"
 version = "0.1.0"
 dependencies = [
  "crow 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "crow_anim 0.1.0 (git+https://github.com/lcnr/crow_anim)",
  "crow_ecs 0.1.0 (git+https://github.com/lcnr/crow_ecs)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "ordered-float 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -234,9 +235,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "crow_anim"
+version = "0.1.0"
+source = "git+https://github.com/lcnr/crow_anim#1b6bda529a1c98cd7d4294cc400a82efff6731f5"
+dependencies = [
+ "crow 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "crow_ecs"
 version = "0.1.0"
-source = "git+https://github.com/lcnr/crow_ecs#6010c2d2f413c13fc01ec075b43109852fe27358"
+source = "git+https://github.com/lcnr/crow_ecs#6397627d2bc967a340616a78e5bf263146dc5c18"
 
 [[package]]
 name = "deflate"
@@ -1104,6 +1113,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum crossbeam-queue 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "c695eeca1e7173472a32221542ae469b3e9aac3a4fc81f7696bcad82029493db"
 "checksum crossbeam-utils 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ce446db02cdc3165b94ae73111e570793400d0794e46125cc4056c81cbb039f4"
 "checksum crow 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "ce96b5c05646946c2a6625075154eaeb7bdece4dbf59521c41044f39d2286514"
+"checksum crow_anim 0.1.0 (git+https://github.com/lcnr/crow_anim)" = "<none>"
 "checksum crow_ecs 0.1.0 (git+https://github.com/lcnr/crow_ecs)" = "<none>"
 "checksum deflate 0.7.20 (registry+https://github.com/rust-lang/crates.io-index)" = "707b6a7b384888a70c8d2e8650b3e60170dfc6a67bb4aa67b6dfca57af4bedb4"
 "checksum dlib 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "77e51249a9d823a4cb79e3eca6dcd756153e8ed0157b6c04775d04bf1b13b76a"

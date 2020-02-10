@@ -1,0 +1,25 @@
+(
+    image_path: "textures/player/idle.png",
+    sprites: [
+        (
+            position: (0, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (32, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (64, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (96, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+    ],
+)

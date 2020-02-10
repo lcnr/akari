@@ -9,6 +9,8 @@ extern crate thread_profiler;
 #[macro_use]
 extern crate log;
 
+use std::io;
+
 use crow::{
     glutin::{EventsLoop, WindowBuilder},
     Context, DrawConfig, Texture,
@@ -16,6 +18,7 @@ use crow::{
 
 pub mod data;
 pub mod environment;
+pub mod init;
 pub mod input;
 pub mod physics;
 pub mod ressources;
@@ -49,32 +52,9 @@ fn main() -> Result<(), crow::Error> {
     let mut r = ressources::Ressources::new(FPS);
     let mut s = Systems::new();
 
-    let player = c.new_entity();
+    let config = environment::EnvironmentConfig::load("ressources/environment.ron").unwrap();
 
-    c.positions
-        .insert(player, data::Position { x: 50.0, y: 100.0 });
-    c.colliders.insert(
-        player,
-        data::Collider {
-            w: 12.0,
-            h: 16.0,
-            ty: data::ColliderType::Player,
-        },
-    );
-    c.velocities
-        .insert(player, data::Velocity { x: 0.0, y: 0.0 });
-    c.gravity.insert(player, data::Gravity);
-    c.player_state.insert(player, data::PlayerState::Idle);
-
-    let f = std::fs::File::open("ressources/environment.ron").expect("Failed opening file");
-    let config: environment::EnvironmentConfig = match ron::de::from_reader(f) {
-        Ok(x) => x,
-        Err(e) => {
-            println!("Failed to load config: {}", e);
-
-            std::process::exit(1);
-        }
-    };
+    init::player(&mut ctx, &mut c, &mut r)?;
 
     let _e = environment::Environment::load(&mut ctx, &mut c, &config)?;
 
@@ -129,7 +109,9 @@ fn main() -> Result<(), crow::Error> {
 
         // destruction timer
 
-        // animation system
+        s.animation
+            .run(&mut c.sprites, &mut c.animations, &mut r.animation_storage);
+
         draw::scene(
             &mut ctx,
             &mut screen_buffer,
@@ -138,6 +120,7 @@ fn main() -> Result<(), crow::Error> {
             &c.depths,
         )?;
         draw::debug_colliders(&mut ctx, &mut screen_buffer, &c.positions, &c.colliders)?;
+
         ctx.draw(
             &mut surface,
             &screen_buffer,
@@ -154,4 +137,22 @@ fn main() -> Result<(), crow::Error> {
     #[cfg(feature = "profiler")]
     thread_profiler::write_profile("profile.json");
     Ok(())
+}
+
+#[derive(Debug)]
+pub enum LoadError {
+    IoError(io::Error),
+    DeserializeError(ron::de::Error),
+}
+
+impl From<io::Error> for LoadError {
+    fn from(err: io::Error) -> Self {
+        LoadError::IoError(err)
+    }
+}
+
+impl From<ron::de::Error> for LoadError {
+    fn from(err: ron::de::Error) -> Self {
+        LoadError::DeserializeError(err)
+    }
 }

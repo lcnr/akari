@@ -21,11 +21,8 @@ impl InputBufferSystem {
         }
 
         for event in events {
-            match event {
-                InputEvent::ButtonDown(Button::Space) => {
-                    *space = Some(JumpBuffer(config.jump_buffer_frames))
-                }
-                _ => (),
+            if let InputEvent::ButtonDown(Button::Space) = event {
+                *space = Some(JumpBuffer(config.jump_buffer_frames))
             }
         }
     }

@@ -1,0 +1,35 @@
+(
+    image_path: "textures/player/jump_fall.png",
+    sprites: [
+        (
+            position: (128, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (160, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (192, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (224, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (256, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (288, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+    ],
+)
