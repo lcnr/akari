@@ -1,10 +1,10 @@
-use std::{fs::File, io, path::Path, iter};
+use std::{fs::File, io, iter, path::Path};
 
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
 use crow::{Context, LoadTextureError};
 
-use crow_anim::{Animation, AnimationStorage};
+use crow_anim::{Animation, AnimationHandle, AnimationStorage};
 
 use crate::{
     data::PlayerAnimations, environment::Tile, spritesheet::SpriteSheet, ARENA_HEIGHT, ARENA_WIDTH,
@@ -75,44 +75,49 @@ pub struct PlayerAnimationsConfig {
     pub falling: Vec<FrameConfig>,
 }
 
+fn add_animation(
+    storage: &mut AnimationStorage,
+    spritesheets: &[SpriteSheet],
+    config: Vec<FrameConfig>,
+    next: Option<AnimationHandle>,
+) -> AnimationHandle {
+    let mut anim = Animation::empty();
+    for FrameConfig {
+        spritesheet,
+        sprite,
+        duration,
+    } in config
+    {
+        anim.frames
+            .extend(iter::repeat(spritesheets[spritesheet].get(sprite)).take(duration));
+    }
+    let handle = storage.insert(anim);
+
+    if let Some(next) = next {
+        storage.get_mut(handle).next = next;
+    } else {
+        storage.get_mut(handle).next = handle;
+    }
+
+    handle
+}
+
 impl PlayerAnimations {
     pub fn from_config(
         ctx: &mut Context,
-        animation_storage: &mut AnimationStorage,
+        storage: &mut AnimationStorage,
         config: PlayerAnimationsConfig,
     ) -> Result<Self, LoadTextureError> {
-        let spritesheets = config.spritesheets.into_iter().map(|path| SpriteSheet::from_config(
-            ctx,
-            &SpriteSheetConfig::load(path).unwrap(),
-        )).collect::<Result<Vec<_>, _>>()?;
+        let sheets = config
+            .spritesheets
+            .into_iter()
+            .map(|path| SpriteSheet::from_config(ctx, &SpriteSheetConfig::load(path).unwrap()))
+            .collect::<Result<Vec<_>, _>>()?;
 
-        let mut idle_animation = Animation::empty();
-        for FrameConfig { spritesheet, sprite, duration } in config.idle {
-            idle_animation.frames.extend(iter::repeat(spritesheets[spritesheet].get(sprite)).take(duration));
-        }
-        let idle = animation_storage.insert(idle_animation);
-        animation_storage.get_mut(idle).next = idle;
-
-        let mut falling_animation = Animation::empty();
-        for FrameConfig { spritesheet, sprite, duration } in config.falling {
-            falling_animation.frames.extend(iter::repeat(spritesheets[spritesheet].get(sprite)).take(duration));
-        }
-        let falling = animation_storage.insert(falling_animation);
-        animation_storage.get_mut(falling).next = falling;
-
-        let mut jumping_animation = Animation::empty();
-        for FrameConfig { spritesheet, sprite, duration } in config.jumping {
-            jumping_animation.frames.extend(iter::repeat(spritesheets[spritesheet].get(sprite)).take(duration));
-        }
-        let jumping = animation_storage.insert(jumping_animation);
-        animation_storage.get_mut(jumping).next = falling;
-
-        let mut start_falling_animation = Animation::empty();
-        for FrameConfig { spritesheet, sprite, duration } in config.start_falling {
-            start_falling_animation.frames.extend(iter::repeat(spritesheets[spritesheet].get(sprite)).take(duration));
-        }
-        let start_falling = animation_storage.insert(start_falling_animation);
-        animation_storage.get_mut(start_falling).next = falling;
+        let idle = add_animation(storage, &sheets, config.idle, None);
+        let falling = add_animation(storage, &sheets, config.falling, None);
+        let start_falling = add_animation(storage, &sheets, config.start_falling, Some(falling));
+        let jumping = add_animation(storage, &sheets, config.jumping, Some(start_falling));
 
         Ok(PlayerAnimations {
             idle,
