@@ -122,6 +122,8 @@ fn main() -> Result<(), crow::Error> {
             &c.positions,
             &c.sprites,
             &c.depths,
+            &c.mirrored,
+            &c.colliders,
         )?;
         //draw::debug_colliders(&mut ctx, &mut screen_buffer, &c.positions, &c.colliders)?;
 

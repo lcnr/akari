@@ -1,10 +1,10 @@
 use crow::{Context, DrawConfig, DrawTarget};
 
-use crow_ecs::{Joinable, Storage};
+use crow_ecs::{Joinable, SparseStorage, Storage};
 
 use crow_anim::Sprite;
 
-use crate::data::{Collider, ColliderType, Depth, Position};
+use crate::data::{Collider, ColliderType, Depth, Mirrored, Position};
 
 pub fn scene<T: DrawTarget>(
     ctx: &mut Context,
@@ -12,20 +12,41 @@ pub fn scene<T: DrawTarget>(
     positions: &Storage<Position>,
     sprites: &Storage<Sprite>,
     depths: &Storage<Depth>,
+    mirrored: &SparseStorage<Mirrored>,
+    colliders: &Storage<Collider>,
 ) -> Result<(), crow::Error> {
     #[cfg(feature = "profiler")]
     profile_scope!("scene");
 
-    for (&Position { x, y }, sprite, depth) in (positions, sprites, depths.maybe()).join() {
+    for (&Position { x, y }, sprite, depth, mirrored, collider) in (
+        positions,
+        sprites,
+        depths.maybe(),
+        mirrored.maybe(),
+        colliders.maybe(),
+    )
+        .join()
+    {
+        let x = x.round() as i32;
+        let y = y.round() as i32 - sprite.offset.1;
+
+        let (x, flip_horizontally) = if let Some(Mirrored) = mirrored {
+            let offset = sprite.texture.width() as i32
+                - sprite.offset.0
+                - collider.map_or(0, |c| c.w.round() as i32);
+
+            (x - offset, true)
+        } else {
+            (x - sprite.offset.0, false)
+        };
+
         ctx.draw(
             target,
             &sprite.texture,
-            (
-                x.round() as i32 - sprite.offset.0,
-                y.round() as i32 - sprite.offset.1,
-            ),
+            (x, y),
             &DrawConfig {
                 depth: depth.copied().map(From::from),
+                flip_horizontally,
                 ..Default::default()
             },
         )?;

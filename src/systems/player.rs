@@ -4,8 +4,8 @@ use crow_anim::{AnimationState, AnimationStorage};
 
 use crate::{
     data::{
-        Collision, Collisions, Components, Grounded, IgnoreBridges, PlayerAnimations, PlayerState,
-        Velocity,
+        Collision, Collisions, Components, Grounded, IgnoreBridges, Mirrored, PlayerAnimations,
+        PlayerState, Velocity,
     },
     input::ButtonState,
     ressources::{JumpBuffer, Ressources},
@@ -52,8 +52,14 @@ impl PlayerStateMachine {
                     let direction = match (r.input_state.left, r.input_state.right) {
                         (ButtonState::Down, ButtonState::Down)
                         | (ButtonState::Up, ButtonState::Up) => 0.0,
-                        (ButtonState::Down, ButtonState::Up) => -1.0,
-                        (ButtonState::Up, ButtonState::Down) => 1.0,
+                        (ButtonState::Down, ButtonState::Up) => {
+                            c.mirrored.insert(entity, Mirrored);
+                            -1.0
+                        }
+                        (ButtonState::Up, ButtonState::Down) => {
+                            c.mirrored.remove(entity);
+                            1.0
+                        }
                     };
 
                     let acceleration = if state == &mut PlayerState::Grounded {

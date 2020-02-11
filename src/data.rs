@@ -24,6 +24,7 @@ pub struct Components {
     pub player_state: SparseStorage<PlayerState>,
     pub player_animations: SparseStorage<PlayerAnimations>,
     pub depths: Storage<Depth>,
+    pub mirrored: SparseStorage<Mirrored>,
 }
 
 impl Components {
@@ -56,6 +57,7 @@ impl Components {
         self.player_state.remove(e);
         self.player_animations.remove(e);
         self.depths.remove(e);
+        self.mirrored.remove(e);
     }
 }
 
@@ -109,9 +111,9 @@ impl From<Depth> for f32 {
         match depth {
             Depth::Background => 0.3,
             Depth::Grass => 0.5,
+            Depth::Tiles => 0.5,
             Depth::Player => 0.6,
             Depth::Bridges => 0.7,
-            Depth::Tiles => 0.7,
             Depth::EditorSelection => 0.8,
             Depth::Particles => 0.9,
         }
@@ -241,6 +243,10 @@ pub struct Gravity;
 
 #[derive(Debug, Clone, Copy)]
 pub struct IgnoreBridges;
+
+/// Used during `draw::scene` to horizontally flip sprites based on the collider of the given entity.
+#[derive(Debug, Clone, Copy)]
+pub struct Mirrored;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum WallCollision {
