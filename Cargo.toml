@@ -11,7 +11,7 @@ serde = { version = "1", features = ["serde_derive"] }
 ron = "0.5.1"
 ordered-float = "1"
 log = "0.4"
-crow = "0.2.2"
+crow = "0.3.0"
 crow_ecs = { git = "https://github.com/lcnr/crow_ecs" }
 crow_anim = { git = "https://github.com/lcnr/crow_anim" }
 thread_profiler = { version = "0.3", optional = true }

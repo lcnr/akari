@@ -77,10 +77,7 @@ pub fn debug_colliders<T: DrawTarget>(
         let x = x.round() as i32;
         let y = y.round() as i32;
 
-        ctx.draw_line(target, (x, y), (xw, y), color)?;
-        ctx.draw_line(target, (xw - 1, y), (xw - 1, yh), color)?;
-        ctx.draw_line(target, (xw - 1, yh - 1), (x, yh - 1), color)?;
-        ctx.draw_line(target, (x, yh - 1), (x, y), color)?;
+        ctx.debug_rectangle(target, (x, y), (xw - 1, yh - 1), color)?;
     }
 
     Ok(())
