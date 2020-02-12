@@ -4,6 +4,8 @@ A showcase game for the `crow` engine, currently work in progress.
 
 Both the code and all the art in this repository is licensed under the [MIT license].
 
+This project is quite early in development and is therefore not yet in a playable state.
+
 [MIT license]: ./LICENSE
 
 ## Design
