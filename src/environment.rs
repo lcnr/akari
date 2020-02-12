@@ -166,7 +166,7 @@ impl Environment {
     }
 
     fn get_spike_sprite_number(&self, x: usize, y: usize) -> usize {
-        // TODO: fix grass generation to actually make some kind of sense
+        // TODO: fix spike generation to actually make some kind of sense
         match (x * x * 5).wrapping_sub(y % 11 + 3) % 2 {
             0 => 56,
             1 => 57,
