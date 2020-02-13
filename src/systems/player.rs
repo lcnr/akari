@@ -11,6 +11,9 @@ use crate::{
     ressources::{JumpBuffer, Ressources},
 };
 
+// FIXME: use a config file instead
+const RUNNING_THRESHHOLD: f32 = 5.0;
+
 #[derive(Debug)]
 pub struct PlayerStateMachine;
 
@@ -135,6 +138,16 @@ impl PlayerStateMachine {
                 && animation.current == player_animations.jumping
             {
                 *animation = r.animation_storage.start(player_animations.start_falling);
+            }
+
+            if *state == PlayerState::Grounded {
+                if velocity.x.abs() >= RUNNING_THRESHHOLD {
+                    if animation.current == player_animations.idle {
+                        *animation = r.animation_storage.start(player_animations.running);
+                    }
+                } else if animation.current == player_animations.running {
+                    *animation = r.animation_storage.start(player_animations.idle);
+                }
             }
         }
     }

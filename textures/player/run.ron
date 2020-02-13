@@ -1,0 +1,75 @@
+(
+    image_path: "textures/player/run.png",
+    sprites: [
+        (
+            position: (0, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (32, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (64, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (96, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (128, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (160, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (192, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (224, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (256, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (288, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (320, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (352, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (384, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+        (
+            position: (416, 0),
+            size: (32, 32),
+            offset: (13, 7),
+        ),
+    ],
+)

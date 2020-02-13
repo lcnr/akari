@@ -70,6 +70,7 @@ pub struct FrameConfig {
 pub struct PlayerAnimationsConfig {
     pub spritesheets: Vec<String>,
     pub idle: Vec<FrameConfig>,
+    pub running: Vec<FrameConfig>,
     pub jumping: Vec<FrameConfig>,
     pub start_falling: Vec<FrameConfig>,
     pub falling: Vec<FrameConfig>,
@@ -115,12 +116,14 @@ impl PlayerAnimations {
             .collect::<Result<Vec<_>, _>>()?;
 
         let idle = add_animation(storage, &sheets, config.idle, None);
+        let running = add_animation(storage, &sheets, config.running, None);
         let falling = add_animation(storage, &sheets, config.falling, None);
         let start_falling = add_animation(storage, &sheets, config.start_falling, Some(falling));
         let jumping = add_animation(storage, &sheets, config.jumping, Some(start_falling));
 
         Ok(PlayerAnimations {
             idle,
+            running,
             jumping,
             start_falling,
             falling,
