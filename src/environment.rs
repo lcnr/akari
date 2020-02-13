@@ -296,4 +296,14 @@ impl Environment {
 
         Ok(env)
     }
+
+    pub fn delete(self, c: &mut Components) {
+        for line in self.tiles.iter() {
+            for tile in line.iter() {
+                if let &Some((_, entity)) = tile {
+                    c.delete_entity(entity);
+                }
+            }
+        }
+    }
 }

@@ -60,7 +60,7 @@ fn main() -> Result<(), crow::Error> {
 
     init::player(&mut ctx, &mut c, &mut r)?;
 
-    let _e = environment::Environment::load(&mut ctx, &mut c, &config)?;
+    let mut e = Some(environment::Environment::load(&mut ctx, &mut c, &config)?);
 
     loop {
         #[cfg(feature = "profiler")]
@@ -78,6 +78,12 @@ fn main() -> Result<(), crow::Error> {
             &mut r.pressed_space,
             &r.config.input_buffer,
         );
+
+        if r.input_state.down == input::ButtonState::Down {
+            if let Some(e) = e.take() {
+                e.delete(&mut c);
+            }
+        }
 
         s.gravity
             .run(&c.gravity, &mut c.velocities, &r.time, &r.config.gravity);
