@@ -6,6 +6,8 @@ Both the code and all the art in this repository is licensed under the [MIT lice
 
 This project is quite early in development and is therefore not yet in a playable state.
 
+![preview](preview.png)  ![preview_colliders](preview_colliders.png)
+
 [MIT license]: ./LICENSE
 
 ## Design
