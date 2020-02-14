@@ -38,10 +38,7 @@ const GAME_SIZE: (u32, u32) = (20 * ARENA_WIDTH as u32, 20 * ARENA_HEIGHT as u32
 const WINDOW_SCALE: u32 = 3;
 const FPS: u32 = 60;
 
-fn main() -> Result<(), crow::Error> {
-    #[cfg(feature = "profiler")]
-    thread_profiler::register_thread_with_profiler();
-
+pub fn run() -> Result<(), crow::Error> {
     let icon = image::open("textures/window_icon.png").unwrap().to_rgba();
     let icon_dimensions = icon.dimensions();
     let icon = Icon::from_rgba(icon.into_raw(), icon_dimensions.0, icon_dimensions.1).unwrap();
@@ -153,7 +150,5 @@ fn main() -> Result<(), crow::Error> {
         r.time.frame();
     }
 
-    #[cfg(feature = "profiler")]
-    thread_profiler::write_profile("profile.json");
     Ok(())
 }
