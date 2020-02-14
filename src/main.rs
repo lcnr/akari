@@ -10,8 +10,8 @@ extern crate thread_profiler;
 extern crate log;
 
 use crow::{
-    glutin::{EventsLoop, WindowBuilder},
-    Context, DrawConfig, Texture,
+    glutin::{EventsLoop, Icon, WindowBuilder},
+    image, Context, DrawConfig, Texture,
 };
 
 pub mod config;
@@ -42,11 +42,18 @@ fn main() -> Result<(), crow::Error> {
     #[cfg(feature = "profiler")]
     thread_profiler::register_thread_with_profiler();
 
+    let icon = image::open("textures/window_icon.png").unwrap().to_rgba();
+    let icon_dimensions = icon.dimensions();
+    let icon = Icon::from_rgba(icon.into_raw(), icon_dimensions.0, icon_dimensions.1).unwrap();
+
     let mut ctx = Context::new(
-        WindowBuilder::new().with_dimensions(From::from((
-            GAME_SIZE.0 * WINDOW_SCALE,
-            GAME_SIZE.1 * WINDOW_SCALE,
-        ))),
+        WindowBuilder::new()
+            .with_dimensions(From::from((
+                GAME_SIZE.0 * WINDOW_SCALE,
+                GAME_SIZE.1 * WINDOW_SCALE,
+            )))
+            .with_title("Akari")
+            .with_window_icon(Some(icon)),
         EventsLoop::new(),
     )?;
     let mut surface = ctx.window_surface();
