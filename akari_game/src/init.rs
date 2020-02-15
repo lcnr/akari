@@ -1,6 +1,6 @@
 use crow::Context;
 
-use crate::{
+use akari_core::{
     config::{Config, PlayerAnimationsConfig},
     data::{
         Collider, ColliderType, Components, Depth, Gravity, PlayerAnimations, PlayerState,
@@ -14,6 +14,9 @@ pub fn player(
     c: &mut Components,
     r: &mut Ressources,
 ) -> Result<(), crow::Error> {
+    #[cfg(feature = "profiler")]
+    profile_scope!("player");
+
     let player = c.new_entity();
 
     c.positions.insert(player, Position { x: 50.0, y: 100.0 });
