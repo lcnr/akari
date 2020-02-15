@@ -2,17 +2,10 @@
 #[macro_use]
 extern crate thread_profiler;
 
-use crow::{
-    glutin::{EventsLoop, WindowBuilder},
-    Context,
-};
-
 use akari_core::{
-    config::{Config, EnvironmentConfig, GameConfig},
-    environment::Environment,
-    input,
+    config::{Config, GameConfig},
     systems::draw,
-    GlobalState, FPS, GAME_SIZE, WINDOW_SCALE,
+    GlobalState,
 };
 
 mod init;
@@ -22,29 +15,11 @@ fn main() -> Result<(), crow::Error> {
     thread_profiler::register_thread_with_profiler();
 
     let config = GameConfig::load("ressources/game_config.ron").unwrap();
+    let mut game = GlobalState::new(config)?;
 
-    let icon = akari_core::load_window_icon("textures/window_icon.png").unwrap();
+    init::player(&mut game.ctx, &mut game.c, &mut game.r)?;
 
-    let mut ctx = Context::new(
-        WindowBuilder::new()
-            .with_dimensions(From::from((
-                GAME_SIZE.0 * WINDOW_SCALE,
-                GAME_SIZE.1 * WINDOW_SCALE,
-            )))
-            .with_title("Akari")
-            .with_window_icon(Some(icon)),
-        EventsLoop::new(),
-    )?;
-
-    let mut game = GlobalState::new(FPS, config);
-
-    let config = EnvironmentConfig::load("ressources/environment.ron").unwrap();
-
-    init::player(&mut ctx, &mut game.c, &mut game.r)?;
-
-    let mut e = Some(Environment::load(&mut ctx, &mut game.c, &config)?);
-
-    game.run(&mut ctx, |ctx, screen_buffer, s, r, c| {
+    game.run(|ctx, screen_buffer, s, r, c| {
         if r.input_state.update(ctx.events_loop()) {
             return Ok(true);
         }
@@ -54,12 +29,6 @@ fn main() -> Result<(), crow::Error> {
             &mut r.pressed_space,
             &r.config.input_buffer,
         );
-
-        if r.input_state.down == input::ButtonState::Down {
-            if let Some(e) = e.take() {
-                e.delete(c);
-            }
-        }
 
         s.gravity
             .run(&c.gravity, &mut c.velocities, &r.time, &r.config.gravity);

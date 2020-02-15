@@ -1,4 +1,11 @@
 (
+    fps: 60,
+    window: (
+        size: (320, 240),
+        scale: 3,
+        title: "Akari",
+        icon_path: "textures/window_icon.png",
+    ),
     gravity: (
         acceleration: -480,
         terminal_velocity: -180,

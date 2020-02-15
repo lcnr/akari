@@ -11,11 +11,13 @@ extern crate log;
 
 use std::path::Path;
 
-use crow::{glutin::Icon, image, Context, DrawConfig, Texture};
+use crow::{
+    glutin::{EventsLoop, Icon, WindowBuilder},
+    image, Context, DrawConfig, Texture,
+};
 
 pub mod config;
 pub mod data;
-pub mod environment;
 pub mod input;
 pub mod physics;
 pub mod ressources;
@@ -25,28 +27,37 @@ pub mod time;
 
 use crate::{config::GameConfig, data::Components, ressources::Ressources, systems::Systems};
 
-pub const ARENA_WIDTH: usize = 16;
-pub const ARENA_HEIGHT: usize = 12;
-pub const GAME_SIZE: (u32, u32) = (20 * ARENA_WIDTH as u32, 20 * ARENA_HEIGHT as u32);
-pub const WINDOW_SCALE: u32 = 3;
-pub const FPS: u32 = 60;
-
 pub struct GlobalState {
     pub s: Systems,
     pub r: Ressources,
     pub c: Components,
+    pub ctx: Context,
 }
 
 impl GlobalState {
-    pub fn new(fps: u32, config: GameConfig) -> Self {
-        GlobalState {
+    pub fn new(config: GameConfig) -> Result<Self, crow::Error> {
+        let icon = load_window_icon(&config.window.icon_path).unwrap();
+
+        let ctx = Context::new(
+            WindowBuilder::new()
+                .with_dimensions(From::from((
+                    config.window.size.0 * config.window.scale,
+                    config.window.size.1 * config.window.scale,
+                )))
+                .with_title(&config.window.title)
+                .with_window_icon(Some(icon)),
+            EventsLoop::new(),
+        )?;
+
+        Ok(GlobalState {
             s: Systems::new(),
-            r: Ressources::new(fps, config),
+            r: Ressources::new(config),
             c: Components::new(),
-        }
+            ctx,
+        })
     }
 
-    pub fn run<F>(self, ctx: &mut Context, mut f: F) -> Result<(), crow::Error>
+    pub fn run<F>(self, mut frame: F) -> Result<(), crow::Error>
     where
         F: FnMut(
             &mut Context,
@@ -56,18 +67,24 @@ impl GlobalState {
             &mut Components,
         ) -> Result<bool, crow::Error>,
     {
-        let (mut s, mut r, mut c) = (self.s, self.r, self.c);
+        let GlobalState {
+            mut s,
+            mut r,
+            mut c,
+            mut ctx,
+        } = self;
 
         let mut surface = ctx.window_surface();
-        let mut screen_buffer = Texture::new(ctx, GAME_SIZE)?;
+        let mut screen_buffer = Texture::new(&mut ctx, r.config.window.size)?;
 
+        r.time.restart();
         loop {
             #[cfg(feature = "profiler")]
             profile_scope!("frame");
             ctx.clear_color(&mut screen_buffer, (0.3, 0.3, 0.8, 1.0))?;
-            screen_buffer.clear_depth(ctx)?;
+            screen_buffer.clear_depth(&mut ctx)?;
 
-            if f(ctx, &mut screen_buffer, &mut s, &mut r, &mut c)? {
+            if frame(&mut ctx, &mut screen_buffer, &mut s, &mut r, &mut c)? {
                 break Ok(());
             }
 
@@ -76,7 +93,7 @@ impl GlobalState {
                 &screen_buffer,
                 (0, 0),
                 &DrawConfig {
-                    scale: (WINDOW_SCALE, WINDOW_SCALE),
+                    scale: (r.config.window.scale, r.config.window.scale),
                     ..Default::default()
                 },
             )?;

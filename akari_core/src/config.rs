@@ -8,9 +8,7 @@ use crow::{Context, LoadTextureError};
 
 use crow_anim::{Animation, AnimationHandle, AnimationStorage};
 
-use crate::{
-    data::PlayerAnimations, environment::Tile, spritesheet::SpriteSheet, ARENA_HEIGHT, ARENA_WIDTH,
-};
+use crate::{data::PlayerAnimations, spritesheet::SpriteSheet};
 
 #[derive(Debug)]
 pub enum LoadError {
@@ -53,11 +51,21 @@ impl<'a, T: DeserializeOwned + Serialize> Config for T {
     }
 }
 
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct GameConfig {
+    pub fps: u32,
+    pub window: WindowConfig,
     pub gravity: GravityConfig,
     pub input_buffer: InputBufferConfig,
     pub player: PlayerConfig,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct WindowConfig {
+    pub size: (u32, u32),
+    pub scale: u32,
+    pub title: String,
+    pub icon_path: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -105,12 +113,6 @@ impl Default for InputBufferConfig {
             jump_buffer_frames: 3,
         }
     }
-}
-
-#[derive(Default, Debug, Clone, Serialize, Deserialize)]
-pub struct EnvironmentConfig {
-    pub spritesheet: String,
-    pub tiles: [[Option<Tile>; ARENA_WIDTH]; ARENA_HEIGHT],
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

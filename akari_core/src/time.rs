@@ -18,6 +18,13 @@ impl Time {
         }
     }
 
+    /// restarts this timer, useful after loading
+    /// a new scene
+    pub fn restart(&mut self) {
+        self.frame_count = 0;
+        self.start = Instant::now();
+    }
+
     pub fn fixed_seconds(&self) -> f32 {
         1.0 / self.fps as f32
     }

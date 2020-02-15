@@ -12,10 +12,10 @@ pub struct Ressources {
 }
 
 impl Ressources {
-    pub fn new(fps: u32, config: GameConfig) -> Self {
+    pub fn new(config: GameConfig) -> Self {
         Ressources {
             input_state: InputState::new(),
-            time: Time::new(fps),
+            time: Time::new(config.fps),
             config,
             pressed_space: None,
             animation_storage: AnimationStorage::new(),
