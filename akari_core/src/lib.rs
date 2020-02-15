@@ -23,7 +23,7 @@ pub mod spritesheet;
 pub mod systems;
 pub mod time;
 
-use crate::{data::Components, ressources::Ressources, systems::Systems};
+use crate::{config::GameConfig, data::Components, ressources::Ressources, systems::Systems};
 
 pub const ARENA_WIDTH: usize = 16;
 pub const ARENA_HEIGHT: usize = 12;
@@ -38,10 +38,10 @@ pub struct GlobalState {
 }
 
 impl GlobalState {
-    pub fn new(fps: u32) -> Self {
+    pub fn new(fps: u32, config: GameConfig) -> Self {
         GlobalState {
             s: Systems::new(),
-            r: Ressources::new(fps),
+            r: Ressources::new(fps, config),
             c: Components::new(),
         }
     }

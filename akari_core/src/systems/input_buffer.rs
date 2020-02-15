@@ -1,6 +1,7 @@
 use crate::{
+    config::InputBufferConfig,
     input::{Button, InputEvent},
-    ressources::{InputBufferConfig, JumpBuffer},
+    ressources::JumpBuffer,
 };
 
 #[derive(Debug)]

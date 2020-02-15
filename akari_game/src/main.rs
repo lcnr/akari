@@ -8,7 +8,7 @@ use crow::{
 };
 
 use akari_core::{
-    config::{Config, EnvironmentConfig},
+    config::{Config, EnvironmentConfig, GameConfig},
     environment::Environment,
     input,
     systems::draw,
@@ -20,6 +20,8 @@ mod init;
 fn main() -> Result<(), crow::Error> {
     #[cfg(feature = "profiler")]
     thread_profiler::register_thread_with_profiler();
+
+    let config = GameConfig::load("ressources/game_config.ron").unwrap();
 
     let icon = akari_core::load_window_icon("textures/window_icon.png").unwrap();
 
@@ -34,7 +36,7 @@ fn main() -> Result<(), crow::Error> {
         EventsLoop::new(),
     )?;
 
-    let mut game = GlobalState::new(FPS);
+    let mut game = GlobalState::new(FPS, config);
 
     let config = EnvironmentConfig::load("ressources/environment.ron").unwrap();
 

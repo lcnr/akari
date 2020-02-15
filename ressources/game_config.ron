@@ -1,0 +1,15 @@
+(
+    gravity: (
+        acceleration: -480,
+        terminal_velocity: -180,
+    ),
+    input_buffer: (
+        jump_buffer_frames: 3,
+    ),
+    player: (
+        jump_speed: 280,
+        movement_speed: 100,
+        grounded_acceleration: 850,
+        airborne_acceleration: 250,
+    ),
+)

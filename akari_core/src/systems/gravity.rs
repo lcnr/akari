@@ -1,8 +1,8 @@
 use crow_ecs::{Joinable, Storage};
 
 use crate::{
+    config::GravityConfig,
     data::{Gravity, Velocity},
-    ressources::GravityConfig,
     time::Time,
 };
 

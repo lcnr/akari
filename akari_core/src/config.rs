@@ -2,6 +2,8 @@ use std::{fs::File, io, iter, path::Path};
 
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
+use ron::ser::PrettyConfig;
+
 use crow::{Context, LoadTextureError};
 
 use crow_anim::{Animation, AnimationHandle, AnimationStorage};
@@ -30,12 +32,78 @@ impl From<ron::de::Error> for LoadError {
 
 pub trait Config: Sized {
     fn load<P: AsRef<Path>>(path: P) -> Result<Self, LoadError>;
+
+    fn example() -> String
+    where
+        Self: Default;
 }
 
-impl<'a, T: DeserializeOwned> Config for T {
+impl<'a, T: DeserializeOwned + Serialize> Config for T {
     fn load<P: AsRef<Path>>(path: P) -> Result<Self, LoadError> {
         let f = File::open(path)?;
         Ok(ron::de::from_reader(f)?)
+    }
+
+    fn example() -> String
+    where
+        Self: Default,
+    {
+        let obj = Self::default();
+        ron::ser::to_string_pretty(&obj, PrettyConfig::default()).unwrap()
+    }
+}
+
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub struct GameConfig {
+    pub gravity: GravityConfig,
+    pub input_buffer: InputBufferConfig,
+    pub player: PlayerConfig,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PlayerConfig {
+    pub jump_speed: f32,
+    pub movement_speed: f32,
+    pub grounded_acceleration: f32,
+    pub airborne_acceleration: f32,
+}
+
+impl Default for PlayerConfig {
+    fn default() -> Self {
+        PlayerConfig {
+            jump_speed: 280.0,
+            movement_speed: 100.0,
+            grounded_acceleration: 850.0,
+            airborne_acceleration: 250.0,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GravityConfig {
+    pub acceleration: f32,
+    pub terminal_velocity: f32,
+}
+
+impl Default for GravityConfig {
+    fn default() -> Self {
+        GravityConfig {
+            acceleration: -480.0,
+            terminal_velocity: -180.0,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InputBufferConfig {
+    pub jump_buffer_frames: u8,
+}
+
+impl Default for InputBufferConfig {
+    fn default() -> Self {
+        InputBufferConfig {
+            jump_buffer_frames: 3,
+        }
     }
 }
 
