@@ -75,6 +75,9 @@ impl EnvironmentSystem {
         c: &mut Components,
         r: &mut Ressources,
     ) -> Result<(), crow::Error> {
+        #[cfg(feature = "profiler")]
+        profile_scope!("run");
+
         let (x, y) = {
             let x = (r.camera.position.x.round() / CHUNK_WIDTH as f32) as i32;
             let y = (r.camera.position.y.round() / CHUNK_HEIGHT as f32) as i32;
@@ -93,10 +96,15 @@ impl EnvironmentSystem {
             (x + 1, y + 1),
         ];
 
-        r.world.chunks.retain(|c| chunks.contains(&c.position));
+        for i in (0..r.world.chunks.len()).rev() {
+            let chunk = &mut r.world.chunks[i];
+            if !chunks.contains(&chunk.position) {
+                r.world.chunks.swap_remove(i).clear(c);
+            }
+        }
 
         for &chunk in chunks.iter() {
-            if !r.world.chunks.iter().any(|c| c.position == (x, y)) {
+            if !r.world.chunks.iter().any(|c| c.position == chunk) {
                 self.load_chunk(ctx, chunk, c, r)?;
             }
         }
@@ -111,6 +119,9 @@ impl EnvironmentSystem {
         c: &mut Components,
         r: &mut Ressources,
     ) -> Result<(), crow::Error> {
+        #[cfg(feature = "profiler")]
+        profile_scope!("load_chunk");
+
         if let Some(path) = r.world.data.chunks.get(&position) {
             let config = ChunkData::load(path).unwrap();
 

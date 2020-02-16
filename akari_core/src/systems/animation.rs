@@ -12,6 +12,8 @@ impl AnimationSystem {
         animations: &mut Storage<AnimationState>,
         animation_storage: &mut AnimationStorage,
     ) {
+        #[cfg(feature = "profiler")]
+        profile_scope!("run");
         for (animation, entity) in (animations, Entities).join() {
             sprites.insert(entity, animation_storage.next(animation));
         }

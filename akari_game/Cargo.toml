@@ -10,6 +10,9 @@ edition = "2018"
 akari_core = { path = "../akari_core" }
 crow = "0.3"
 
+log = "0.4"
+pretty_env_logger = "0.4"
+
 thread_profiler = { version = "0.3", optional = true }
 
 [features]

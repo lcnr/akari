@@ -12,6 +12,10 @@ use akari_core::{
 mod init;
 
 fn main() -> Result<(), crow::Error> {
+    pretty_env_logger::formatted_timed_builder()
+        .filter_level(log::LevelFilter::max())
+        .init();
+
     #[cfg(feature = "profiler")]
     thread_profiler::register_thread_with_profiler();
 

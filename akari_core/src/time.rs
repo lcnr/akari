@@ -37,7 +37,7 @@ impl Time {
                 thread::yield_now();
             }
         } else {
-            println!("LAG at frame {}!", self.frame_count)
+            warn!("Lag at frame {}", self.frame_count)
         }
     }
 }

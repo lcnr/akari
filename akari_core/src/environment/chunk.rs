@@ -147,6 +147,7 @@ impl ChunkData {
     }
 }
 
+#[derive(Debug)]
 pub struct Chunk {
     pub position: (i32, i32),
     pub tiles: Vec<Entity>,
@@ -181,6 +182,12 @@ impl Chunk {
         }
 
         Ok(chunk)
+    }
+
+    pub fn clear(&mut self, c: &mut Components) {
+        for e in self.tiles.drain(..) {
+            c.delete_entity(e);
+        }
     }
 
     pub fn build_spritesheet<P: AsRef<Path>>(
