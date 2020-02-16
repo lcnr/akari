@@ -61,7 +61,7 @@ impl Components {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy)]
 pub struct Position {
     pub x: f32,
     pub y: f32,

@@ -1,0 +1,5 @@
+(
+    chunks: {
+        (0, 0): "ressources/environment/test_chunk.ron",
+    },
+)

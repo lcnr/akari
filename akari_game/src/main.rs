@@ -4,6 +4,7 @@ extern crate thread_profiler;
 
 use akari_core::{
     config::{Config, GameConfig},
+    environment::WorldData,
     systems::draw,
     GlobalState,
 };
@@ -15,7 +16,8 @@ fn main() -> Result<(), crow::Error> {
     thread_profiler::register_thread_with_profiler();
 
     let config = GameConfig::load("ressources/game_config.ron").unwrap();
-    let mut game = GlobalState::new(config)?;
+    let world_data = WorldData::load("ressources/environment/world.ron").unwrap();
+    let mut game = GlobalState::new(config, world_data)?;
 
     init::player(&mut game.ctx, &mut game.c, &mut game.r)?;
 
@@ -62,10 +64,12 @@ fn main() -> Result<(), crow::Error> {
 
         s.player.run(c, r, &collisions);
 
-        // destruction timer
+        s.environment.run(ctx, c, r)?;
 
         s.animation
             .run(&mut c.sprites, &mut c.animations, &mut r.animation_storage);
+
+        s.lazy_update.run(c, r);
 
         draw::scene(
             ctx,
