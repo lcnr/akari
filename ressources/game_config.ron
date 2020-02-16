@@ -14,7 +14,7 @@
         jump_buffer_frames: 3,
     ),
     player: (
-        jump_speed: 280,
+        jump_speed: 290,
         movement_speed: 100,
         grounded_acceleration: 850,
         airborne_acceleration: 250,
