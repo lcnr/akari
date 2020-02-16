@@ -152,6 +152,8 @@ impl PlayerStateMachine {
             }
 
             r.camera.position = *position;
+            r.camera.position.x -= 100.0;
+            r.camera.position.y -= 100.0;
         }
     }
 }

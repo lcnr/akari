@@ -4,7 +4,10 @@ use crow_ecs::{Joinable, SparseStorage, Storage};
 
 use crow_anim::Sprite;
 
-use crate::data::{Collider, ColliderType, Depth, Mirrored, Position};
+use crate::{
+    data::{Collider, ColliderType, Depth, Mirrored, Position},
+    ressources::Camera,
+};
 
 pub fn scene<T: DrawTarget>(
     ctx: &mut Context,
@@ -14,6 +17,7 @@ pub fn scene<T: DrawTarget>(
     depths: &Storage<Depth>,
     mirrored: &SparseStorage<Mirrored>,
     colliders: &Storage<Collider>,
+    camera: &Camera,
 ) -> Result<(), crow::Error> {
     #[cfg(feature = "profiler")]
     profile_scope!("scene");
@@ -27,8 +31,8 @@ pub fn scene<T: DrawTarget>(
     )
         .join()
     {
-        let x = x.round() as i32;
-        let y = y.round() as i32 - sprite.offset.1;
+        let x = (x - camera.position.x).round() as i32;
+        let y = (y - camera.position.y).round() as i32 - sprite.offset.1;
 
         let (x, flip_horizontally) = if let Some(Mirrored) = mirrored {
             let offset = sprite.texture.width() as i32
@@ -60,11 +64,15 @@ pub fn debug_colliders<T: DrawTarget>(
     target: &mut T,
     positions: &Storage<Position>,
     colliders: &Storage<Collider>,
+    camera: &Camera,
 ) -> Result<(), crow::Error> {
     #[cfg(feature = "profiler")]
     profile_scope!("debug_colliders");
 
     for (&Position { x, y }, collider) in (positions, colliders).join() {
+        let x = x - camera.position.x;
+        let y = y - camera.position.y;
+
         let color = match collider.ty {
             ColliderType::Player => (0.0, 1.0, 0.0, 0.4),
             ColliderType::PlayerDamage => (1.0, 0.0, 0.0, 0.8),

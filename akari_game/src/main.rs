@@ -79,8 +79,9 @@ fn main() -> Result<(), crow::Error> {
             &c.depths,
             &c.mirrored,
             &c.colliders,
+            &r.camera,
         )?;
-        draw::debug_colliders(ctx, screen_buffer, &c.positions, &c.colliders)?;
+        draw::debug_colliders(ctx, screen_buffer, &c.positions, &c.colliders, &r.camera)?;
 
         Ok(false)
     })?;
