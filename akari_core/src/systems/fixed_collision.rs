@@ -44,22 +44,21 @@ impl FixedCollisionSystem {
         }
 
         for (other, solids) in self.moved.drain() {
-            let (_other_pos, other_prev_pos, other_col, other_vel) =
-                pos_prev_pos_col_vel(positions, previous_positions, colliders, velocities, other);
+            let (other_prev_pos, other_col, other_vel) =
+                prev_pos_col_vel(positions, previous_positions, colliders, velocities, other);
 
             let (unique, shared) =
                 solids
                     .iter()
                     .copied()
                     .fold((0b0000, 0b1111), |(unique, shared), solid| {
-                        let (_solid_pos, solid_prev_pos, solid_col, solid_vel) =
-                            pos_prev_pos_col_vel(
-                                positions,
-                                previous_positions,
-                                colliders,
-                                velocities,
-                                solid,
-                            );
+                        let (solid_prev_pos, solid_col, solid_vel) = prev_pos_col_vel(
+                            positions,
+                            previous_positions,
+                            colliders,
+                            velocities,
+                            solid,
+                        );
 
                         let dir = collision_direction(
                             (solid_prev_pos, solid_col, solid_vel),
@@ -169,6 +168,28 @@ impl FixedCollisionSystem {
     }
 }
 
+fn build_solid_shared<'a>(
+    positions: &'a Storage<Position>,
+    previous_positions: &'a Storage<Position>,
+    colliders: &'a Storage<Collider>,
+    velocities: &'a Storage<Velocity>,
+    (other_prev_pos, other_col, other_vel): (Position, Collider, Velocity),
+) -> impl Fn(&Entity) -> (Entity, Position, Collider, CollisionDirection) + 'a + Copy {
+    move |&solid| {
+        let solid_pos = positions.get(solid).copied().unwrap();
+        let solid_prev_pos = previous_positions.get(solid).copied().unwrap_or(solid_pos);
+        let solid_col = colliders.get(solid).copied().unwrap();
+        let solid_vel = velocities.get(solid).copied().unwrap_or_default();
+
+        let direction = collision_direction(
+            (solid_prev_pos, solid_col, solid_vel),
+            (other_prev_pos, other_col, other_vel),
+        );
+
+        (solid, solid_pos, solid_col, direction)
+    }
+}
+
 fn collision_none(
     unique: u8,
     other: Entity,
@@ -180,8 +201,8 @@ fn collision_none(
     mut velocities: &mut Storage<Velocity>,
     colliders: &Storage<Collider>,
 ) {
-    let (_other_pos, other_prev_pos, other_col, other_vel) =
-        pos_prev_pos_col_vel(positions, previous_positions, colliders, velocities, other);
+    let (other_prev_pos, other_col, other_vel) =
+        prev_pos_col_vel(positions, previous_positions, colliders, velocities, other);
 
     let (vertical, horizontal) = if let (Ok(vertical), Ok(horizontal)) = (
         CollisionDirection::try_from(unique & 0b0101),
@@ -197,57 +218,39 @@ fn collision_none(
         warn!("unit is currently inside of a collider");
         return;
     }
+
+    let solid_shared = build_solid_shared(
+        positions,
+        previous_positions,
+        colliders,
+        velocities,
+        (other_prev_pos, other_col, other_vel),
+    );
+
+    let entity_id = |(e, _, _, _)| e;
+
     let vertical_solid = if vertical == CollisionDirection::Above {
         solids
             .iter()
-            .copied()
-            .max_by_key(|&solid| {
-                let (solid_pos, solid_prev_pos, solid_col, solid_vel) = pos_prev_pos_col_vel(
-                    positions,
-                    previous_positions,
-                    colliders,
-                    velocities,
-                    solid,
-                );
-
-                if collision_direction(
-                    (solid_prev_pos, solid_col, solid_vel),
-                    (other_prev_pos, other_col, other_vel),
-                ) & CollisionDirection::Above
-                    != CollisionDirection::None
-                {
-                    OrderedFloat(solid_col.upper_border(solid_pos))
-                } else {
-                    OrderedFloat(std::f32::MIN)
-                }
+            .map(solid_shared)
+            .filter(|&(_, _, _, dir)| dir & CollisionDirection::Above != CollisionDirection::None)
+            .max_by_key(|&(_, solid_pos, solid_col, _)| {
+                OrderedFloat(solid_col.upper_border(solid_pos))
             })
+            .map(entity_id)
             .unwrap()
     } else {
         solids
             .iter()
-            .copied()
-            .min_by_key(|&solid| {
-                let (solid_pos, solid_prev_pos, solid_col, solid_vel) = pos_prev_pos_col_vel(
-                    positions,
-                    previous_positions,
-                    colliders,
-                    velocities,
-                    solid,
-                );
-
-                if collision_direction(
-                    (solid_prev_pos, solid_col, solid_vel),
-                    (other_prev_pos, other_col, other_vel),
-                ) & CollisionDirection::Below
-                    != CollisionDirection::None
-                {
-                    OrderedFloat(solid_col.lower_border(solid_pos))
-                } else {
-                    OrderedFloat(std::f32::MAX)
-                }
+            .map(solid_shared)
+            .filter(|&(_, _, _, dir)| dir & CollisionDirection::Below != CollisionDirection::None)
+            .min_by_key(|&(_, solid_pos, solid_col, _)| {
+                OrderedFloat(solid_col.lower_border(solid_pos))
             })
+            .map(entity_id)
             .unwrap()
     };
+
     resolve_collision(
         vertical,
         other,
@@ -259,53 +262,33 @@ fn collision_none(
         &colliders,
     );
 
+    let solid_shared = build_solid_shared(
+        positions,
+        previous_positions,
+        colliders,
+        velocities,
+        (other_prev_pos, other_col, other_vel),
+    );
+
     let horizontal_solid = if horizontal == CollisionDirection::Right {
         solids
-            .into_iter()
-            .max_by_key(|&solid| {
-                let (solid_pos, solid_prev_pos, solid_col, solid_vel) = pos_prev_pos_col_vel(
-                    positions,
-                    previous_positions,
-                    colliders,
-                    velocities,
-                    solid,
-                );
-
-                if collision_direction(
-                    (solid_prev_pos, solid_col, solid_vel),
-                    (other_prev_pos, other_col, other_vel),
-                ) & CollisionDirection::Right
-                    != CollisionDirection::None
-                {
-                    OrderedFloat(solid_col.right_border(solid_pos))
-                } else {
-                    OrderedFloat(std::f32::MIN)
-                }
+            .iter()
+            .map(solid_shared)
+            .filter(|&(_, _, _, dir)| dir & CollisionDirection::Right != CollisionDirection::None)
+            .max_by_key(|&(_, solid_pos, solid_col, _)| {
+                OrderedFloat(solid_col.right_border(solid_pos))
             })
+            .map(entity_id)
             .unwrap()
     } else {
         solids
-            .into_iter()
-            .min_by_key(|&solid| {
-                let (solid_pos, solid_prev_pos, solid_col, solid_vel) = pos_prev_pos_col_vel(
-                    positions,
-                    previous_positions,
-                    colliders,
-                    velocities,
-                    solid,
-                );
-
-                if collision_direction(
-                    (solid_prev_pos, solid_col, solid_vel),
-                    (other_prev_pos, other_col, other_vel),
-                ) & CollisionDirection::Left
-                    != CollisionDirection::None
-                {
-                    OrderedFloat(solid_col.left_border(solid_pos))
-                } else {
-                    OrderedFloat(std::f32::MAX)
-                }
+            .iter()
+            .map(solid_shared)
+            .filter(|&(_, _, _, dir)| dir & CollisionDirection::Left != CollisionDirection::None)
+            .min_by_key(|&(_, solid_pos, solid_col, _)| {
+                OrderedFloat(solid_col.left_border(solid_pos))
             })
+            .map(entity_id)
             .unwrap()
     };
     resolve_collision(
@@ -320,18 +303,18 @@ fn collision_none(
     );
 }
 
-fn pos_prev_pos_col_vel(
+fn prev_pos_col_vel(
     positions: &Storage<Position>,
     previous_positions: &Storage<Position>,
     colliders: &Storage<Collider>,
-    velocities: &mut Storage<Velocity>,
+    velocities: &Storage<Velocity>,
     entity: Entity,
-) -> (Position, Position, Collider, Velocity) {
+) -> (Position, Collider, Velocity) {
     let pos = positions.get(entity).copied().unwrap();
     let prev_pos = previous_positions.get(entity).copied().unwrap_or(pos);
     let col = colliders.get(entity).copied().unwrap();
     let vel = velocities.get(entity).copied().unwrap_or_default();
-    (pos, prev_pos, col, vel)
+    (prev_pos, col, vel)
 }
 
 fn resolve_collision(
