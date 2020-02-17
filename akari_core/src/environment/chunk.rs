@@ -163,18 +163,15 @@ impl Drop for Chunk {
 
 impl Chunk {
     pub fn empty(position: (i32, i32), c: &mut Components) -> Self {
-        let mut chunk = Chunk {
-            position,
-            tiles: Vec::new(),
-        };
+        let mut tiles = Vec::new();
 
         let restriction = c.new_entity();
-        chunk.tiles.push(restriction);
+        tiles.push(restriction);
         c.positions.insert(
             restriction,
             Position {
                 x: (position.0 * CHUNK_WIDTH as i32) as f32,
-                y: (position.0 * CHUNK_HEIGHT as i32) as f32,
+                y: (position.1 * CHUNK_HEIGHT as i32) as f32,
             },
         );
 
@@ -187,7 +184,7 @@ impl Chunk {
             },
         );
 
-        chunk
+        Chunk { position, tiles }
     }
 
     pub fn new(

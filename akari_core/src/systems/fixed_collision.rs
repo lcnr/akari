@@ -11,7 +11,6 @@ use crate::{
         Velocity, WallCollision,
     },
     physics::collision_direction,
-    time::Time,
 };
 
 #[derive(Default, Debug)]
@@ -29,11 +28,11 @@ impl FixedCollisionSystem {
     pub fn run(
         &mut self,
         mut positions: &mut Storage<Position>,
+        previous_positions: &Storage<Position>,
         mut grounded: &mut Storage<Grounded>,
         mut wall_collisions: &mut Storage<WallCollision>,
         mut velocities: &mut Storage<Velocity>,
         colliders: &Storage<Collider>,
-        time: &Time,
         collisions: &Collisions,
     ) {
         #[cfg(feature = "profiler")]
@@ -45,20 +44,31 @@ impl FixedCollisionSystem {
         }
 
         for (other, solids) in self.moved.drain() {
-            let (other_pos, other_col, other_vel) =
-                pos_col_vel(positions, colliders, velocities, time, other);
+            let (_other_pos, other_prev_pos, other_col, other_vel) = pos_prev_pos_col_vel(
+                positions,
+                previous_positions,
+                colliders,
+                velocities,
+                other,
+            );
 
             let (unique, shared) =
                 solids
                     .iter()
                     .copied()
                     .fold((0b0000, 0b1111), |(unique, shared), solid| {
-                        let (solid_pos, solid_col, solid_vel) =
-                            pos_col_vel(positions, colliders, velocities, time, solid);
+                        let (_solid_pos, solid_prev_pos, solid_col, solid_vel) =
+                            pos_prev_pos_col_vel(
+                                positions,
+                                previous_positions,
+                                colliders,
+                                velocities,
+                                solid,
+                            );
 
                         let dir = collision_direction(
-                            (solid_pos, solid_col, solid_vel),
-                            (other_pos, other_col, other_vel),
+                            (solid_prev_pos, solid_col, solid_vel),
+                            (other_prev_pos, other_col, other_vel),
                         ) as u8;
                         (unique | dir, shared & dir)
                     });
@@ -153,11 +163,11 @@ impl FixedCollisionSystem {
                     other,
                     solids,
                     positions,
+                    previous_positions,
                     grounded,
                     wall_collisions,
                     velocities,
                     colliders,
-                    time,
                 ),
             };
         }
@@ -169,14 +179,19 @@ fn collision_none(
     other: Entity,
     solids: Vec<Entity>,
     mut positions: &mut Storage<Position>,
+    previous_positions: &Storage<Position>,
     mut grounded: &mut Storage<Grounded>,
     mut wall_collisions: &mut Storage<WallCollision>,
     mut velocities: &mut Storage<Velocity>,
     colliders: &Storage<Collider>,
-    time: &Time,
 ) {
-    let (other_pos, other_col, other_vel) =
-        pos_col_vel(positions, colliders, velocities, time, other);
+    let (_other_pos, other_prev_pos, other_col, other_vel) = pos_prev_pos_col_vel(
+        positions,
+        previous_positions,
+        colliders,
+        velocities,
+        other,
+    );
 
     let (vertical, horizontal) = if let (Ok(vertical), Ok(horizontal)) = (
         CollisionDirection::try_from(unique & 0b0101),
@@ -197,12 +212,17 @@ fn collision_none(
             .iter()
             .copied()
             .max_by_key(|&solid| {
-                let (solid_pos, solid_col, solid_vel) =
-                    pos_col_vel(positions, colliders, velocities, time, solid);
+                let (solid_pos, solid_prev_pos, solid_col, solid_vel) = pos_prev_pos_col_vel(
+                    positions,
+                    previous_positions,
+                    colliders,
+                    velocities,
+                    solid,
+                );
 
                 if collision_direction(
-                    (solid_pos, solid_col, solid_vel),
-                    (other_pos, other_col, other_vel),
+                    (solid_prev_pos, solid_col, solid_vel),
+                    (other_prev_pos, other_col, other_vel),
                 ) & CollisionDirection::Above
                     != CollisionDirection::None
                 {
@@ -217,12 +237,17 @@ fn collision_none(
             .iter()
             .copied()
             .min_by_key(|&solid| {
-                let (solid_pos, solid_col, solid_vel) =
-                    pos_col_vel(positions, colliders, velocities, time, solid);
+                let (solid_pos, solid_prev_pos, solid_col, solid_vel) = pos_prev_pos_col_vel(
+                    positions,
+                    previous_positions,
+                    colliders,
+                    velocities,
+                    solid,
+                );
 
                 if collision_direction(
-                    (solid_pos, solid_col, solid_vel),
-                    (other_pos, other_col, other_vel),
+                    (solid_prev_pos, solid_col, solid_vel),
+                    (other_prev_pos, other_col, other_vel),
                 ) & CollisionDirection::Below
                     != CollisionDirection::None
                 {
@@ -248,12 +273,17 @@ fn collision_none(
         solids
             .into_iter()
             .max_by_key(|&solid| {
-                let (solid_pos, solid_col, solid_vel) =
-                    pos_col_vel(positions, colliders, velocities, time, solid);
+                let (solid_pos, solid_prev_pos, solid_col, solid_vel) = pos_prev_pos_col_vel(
+                    positions,
+                    previous_positions,
+                    colliders,
+                    velocities,
+                    solid,
+                );
 
                 if collision_direction(
-                    (solid_pos, solid_col, solid_vel),
-                    (other_pos, other_col, other_vel),
+                    (solid_prev_pos, solid_col, solid_vel),
+                    (other_prev_pos, other_col, other_vel),
                 ) & CollisionDirection::Right
                     != CollisionDirection::None
                 {
@@ -267,12 +297,17 @@ fn collision_none(
         solids
             .into_iter()
             .min_by_key(|&solid| {
-                let (solid_pos, solid_col, solid_vel) =
-                    pos_col_vel(positions, colliders, velocities, time, solid);
+                let (solid_pos, solid_prev_pos, solid_col, solid_vel) = pos_prev_pos_col_vel(
+                    positions,
+                    previous_positions,
+                    colliders,
+                    velocities,
+                    solid,
+                );
 
                 if collision_direction(
-                    (solid_pos, solid_col, solid_vel),
-                    (other_pos, other_col, other_vel),
+                    (solid_prev_pos, solid_col, solid_vel),
+                    (other_prev_pos, other_col, other_vel),
                 ) & CollisionDirection::Left
                     != CollisionDirection::None
                 {
@@ -295,17 +330,18 @@ fn collision_none(
     );
 }
 
-fn pos_col_vel(
+fn pos_prev_pos_col_vel(
     positions: &Storage<Position>,
+    previous_positions: &Storage<Position>,
     colliders: &Storage<Collider>,
     velocities: &mut Storage<Velocity>,
-    time: &Time,
     entity: Entity,
-) -> (Position, Collider, Velocity) {
+) -> (Position, Position, Collider, Velocity) {
     let pos = positions.get(entity).copied().unwrap();
+    let prev_pos = previous_positions.get(entity).copied().unwrap_or(pos);
     let col = colliders.get(entity).copied().unwrap();
-    let vel = velocities.get(entity).copied().unwrap_or_default() * time.fixed_seconds();
-    (pos, col, vel)
+    let vel = velocities.get(entity).copied().unwrap_or_default();
+    (pos, prev_pos, col, vel)
 }
 
 fn resolve_collision(

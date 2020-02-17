@@ -113,6 +113,7 @@ impl EnvironmentSystem {
 
         for &chunk in chunks.iter() {
             if !r.world.chunks.iter().any(|c| c.position == chunk) {
+                info!("Loading chunk: {:?}", chunk);
                 self.load_chunk(ctx, chunk, c, r)?;
             }
         }
