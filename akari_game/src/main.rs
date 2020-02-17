@@ -25,7 +25,9 @@ fn main() -> Result<(), crow::Error> {
 
     init::player(&mut game.ctx, &mut game.c, &mut game.r)?;
     init::camera(&mut game.c, &mut game.r);
-    game.s.environment.run(&mut game.ctx, &mut game.c, &mut game.r)?;
+    game.s
+        .environment
+        .run(&mut game.ctx, &mut game.c, &mut game.r)?;
 
     game.run(|ctx, screen_buffer, s, r, c| {
         if r.input_state.update(ctx.events_loop()) {

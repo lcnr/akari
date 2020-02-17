@@ -44,13 +44,8 @@ impl FixedCollisionSystem {
         }
 
         for (other, solids) in self.moved.drain() {
-            let (_other_pos, other_prev_pos, other_col, other_vel) = pos_prev_pos_col_vel(
-                positions,
-                previous_positions,
-                colliders,
-                velocities,
-                other,
-            );
+            let (_other_pos, other_prev_pos, other_col, other_vel) =
+                pos_prev_pos_col_vel(positions, previous_positions, colliders, velocities, other);
 
             let (unique, shared) =
                 solids
@@ -185,13 +180,8 @@ fn collision_none(
     mut velocities: &mut Storage<Velocity>,
     colliders: &Storage<Collider>,
 ) {
-    let (_other_pos, other_prev_pos, other_col, other_vel) = pos_prev_pos_col_vel(
-        positions,
-        previous_positions,
-        colliders,
-        velocities,
-        other,
-    );
+    let (_other_pos, other_prev_pos, other_col, other_vel) =
+        pos_prev_pos_col_vel(positions, previous_positions, colliders, velocities, other);
 
     let (vertical, horizontal) = if let (Ok(vertical), Ok(horizontal)) = (
         CollisionDirection::try_from(unique & 0b0101),
