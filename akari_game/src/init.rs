@@ -3,7 +3,7 @@ use crow::Context;
 use akari_core::{
     config::{Config, PlayerAnimationsConfig},
     data::{
-        Collider, ColliderType, Components, Depth, Gravity, PlayerAnimations, PlayerState,
+        Camera, Collider, ColliderType, Components, Depth, Gravity, PlayerAnimations, PlayerState,
         Position, Velocity,
     },
     ressources::Ressources,
@@ -45,4 +45,23 @@ pub fn player(
     c.player_animations.insert(player, player_animations);
 
     Ok(())
+}
+
+pub fn camera(c: &mut Components, r: &mut Ressources) {
+    let camera = c.new_entity();
+
+    c.cameras.insert(camera, Camera);
+
+    c.positions.insert(camera, Position { x: 0.0, y: 0.0 });
+
+    c.velocities.insert(camera, Velocity { x: 0.0, y: 0.0 });
+
+    c.colliders.insert(
+        camera,
+        Collider {
+            w: r.config.window.size.0 as f32,
+            h: r.config.window.size.1 as f32,
+            ty: ColliderType::Camera,
+        },
+    );
 }

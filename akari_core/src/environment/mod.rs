@@ -4,6 +4,8 @@ use serde::{Deserialize, Serialize};
 
 use crow::Context;
 
+use crow_ecs::Joinable;
+
 use crate::{
     config::Config,
     data::{Components, Depth},
@@ -78,10 +80,16 @@ impl EnvironmentSystem {
         #[cfg(feature = "profiler")]
         profile_scope!("run");
 
-        let (x, y) = {
-            let x = (r.camera.position.x.round() / CHUNK_WIDTH as f32) as i32;
-            let y = (r.camera.position.y.round() / CHUNK_HEIGHT as f32) as i32;
-            (x, y)
+        let (x, y) = match (&c.player_state, &c.positions).join().unique() {
+            Ok((_state, position)) => {
+                let x = (position.x.round() / CHUNK_WIDTH as f32) as i32;
+                let y = (position.y.round() / CHUNK_HEIGHT as f32) as i32;
+                (x, y)
+            }
+            Err(err) => {
+                error!("No unique player: {:?}", err);
+                return Ok(());
+            }
         };
 
         let chunks = [
@@ -126,6 +134,9 @@ impl EnvironmentSystem {
             let config = ChunkData::load(path).unwrap();
 
             let chunk = Chunk::new(ctx, position, config, c)?;
+            r.world.chunks.push(chunk);
+        } else {
+            let chunk = Chunk::empty(position, c);
             r.world.chunks.push(chunk);
         }
 

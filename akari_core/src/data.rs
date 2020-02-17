@@ -25,6 +25,7 @@ pub struct Components {
     pub player_animations: SparseStorage<PlayerAnimations>,
     pub depths: Storage<Depth>,
     pub mirrored: SparseStorage<Mirrored>,
+    pub cameras: SparseStorage<Camera>,
 }
 
 impl Components {
@@ -58,6 +59,7 @@ impl Components {
         self.player_animations.remove(e);
         self.depths.remove(e);
         self.mirrored.remove(e);
+        self.cameras.remove(e);
     }
 }
 
@@ -173,6 +175,8 @@ pub enum ColliderType {
     Player,
     Bridge,
     PlayerDamage,
+    Camera,
+    CameraRestriction,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -254,3 +258,6 @@ pub enum WallCollision {
     Right,
     Left,
 }
+
+#[derive(Default, Debug, Clone)]
+pub struct Camera;

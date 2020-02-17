@@ -6,6 +6,9 @@
         title: "Akari",
         icon_path: "textures/window_icon.png",
     ),
+    camera: (
+        offset: (100.0, 100.0),
+    ),
     gravity: (
         acceleration: -480,
         terminal_velocity: -180,

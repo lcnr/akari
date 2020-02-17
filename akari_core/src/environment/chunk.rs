@@ -162,6 +162,34 @@ impl Drop for Chunk {
 }
 
 impl Chunk {
+    pub fn empty(position: (i32, i32), c: &mut Components) -> Self {
+        let mut chunk = Chunk {
+            position,
+            tiles: Vec::new(),
+        };
+
+        let restriction = c.new_entity();
+        chunk.tiles.push(restriction);
+        c.positions.insert(
+            restriction,
+            Position {
+                x: (position.0 * CHUNK_WIDTH as i32) as f32,
+                y: (position.0 * CHUNK_HEIGHT as i32) as f32,
+            },
+        );
+
+        c.colliders.insert(
+            restriction,
+            Collider {
+                w: CHUNK_WIDTH as f32,
+                h: CHUNK_HEIGHT as f32,
+                ty: ColliderType::CameraRestriction,
+            },
+        );
+
+        chunk
+    }
+
     pub fn new(
         ctx: &mut Context,
         position: (i32, i32),

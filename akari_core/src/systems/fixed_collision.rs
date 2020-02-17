@@ -337,7 +337,10 @@ fn resolve_collision(
                 ColliderType::Bridge | ColliderType::Environment => {
                     grounded.insert(other, Grounded);
                 }
-                ColliderType::Player | ColliderType::PlayerDamage => (),
+                ColliderType::Player
+                | ColliderType::PlayerDamage
+                | ColliderType::Camera
+                | ColliderType::CameraRestriction => (),
             }
 
             other_pos.y = solid_col.upper_border(solid_pos);
@@ -353,7 +356,10 @@ fn resolve_collision(
                 ColliderType::Bridge | ColliderType::Environment => {
                     wall_collisions.insert(other, WallCollision::Left)
                 }
-                ColliderType::Player | ColliderType::PlayerDamage => None,
+                ColliderType::Player
+                | ColliderType::PlayerDamage
+                | ColliderType::Camera
+                | ColliderType::CameraRestriction => None,
             };
         }
         CollisionDirection::Right => {
@@ -364,7 +370,10 @@ fn resolve_collision(
                 ColliderType::Bridge | ColliderType::Environment => {
                     wall_collisions.insert(other, WallCollision::Right)
                 }
-                ColliderType::Player | ColliderType::PlayerDamage => None,
+                ColliderType::Player
+                | ColliderType::PlayerDamage
+                | ColliderType::Camera
+                | ColliderType::CameraRestriction => None,
             };
         }
         CollisionDirection::None => (),

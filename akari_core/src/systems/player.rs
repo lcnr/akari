@@ -22,21 +22,10 @@ impl PlayerStateMachine {
         #[cfg(feature = "profiler")]
         profile_scope!("run");
 
-        for (
-            state,
-            animation,
-            player_animations,
-            position,
-            previous_position,
-            velocity,
-            grounded,
-            entity,
-        ) in (
+        for (state, animation, player_animations, velocity, grounded, entity) in (
             &mut c.player_state,
             &mut c.animations,
             &c.player_animations,
-            &c.positions,
-            (&c.previous_positions).maybe(),
             &mut c.velocities,
             (&c.grounded).maybe(),
             Entities,
@@ -160,10 +149,6 @@ impl PlayerStateMachine {
                     *animation = r.animation_storage.start(player_animations.idle);
                 }
             }
-
-            r.camera.position = previous_position.copied().unwrap_or(*position);
-            r.camera.position.x -= 100.0;
-            r.camera.position.y -= 100.0;
         }
     }
 }

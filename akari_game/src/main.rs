@@ -24,6 +24,7 @@ fn main() -> Result<(), crow::Error> {
     let mut game = GlobalState::new(config, world_data)?;
 
     init::player(&mut game.ctx, &mut game.c, &mut game.r)?;
+    init::camera(&mut game.c, &mut game.r);
 
     game.run(|ctx, screen_buffer, s, r, c| {
         if r.input_state.update(ctx.events_loop()) {
@@ -34,6 +35,16 @@ fn main() -> Result<(), crow::Error> {
             r.input_state.events(),
             &mut r.pressed_space,
             &r.config.input_buffer,
+        );
+
+        s.camera.run(
+            &c.player_state,
+            &c.positions,
+            &c.previous_positions,
+            &mut c.velocities,
+            &c.cameras,
+            &r.time,
+            &r.config.camera,
         );
 
         s.gravity
@@ -83,9 +94,9 @@ fn main() -> Result<(), crow::Error> {
             &c.depths,
             &c.mirrored,
             &c.colliders,
-            &r.camera,
+            &c.cameras,
         )?;
-        draw::debug_colliders(ctx, screen_buffer, &c.positions, &c.colliders, &r.camera)?;
+        draw::debug_colliders(ctx, screen_buffer, &c.positions, &c.colliders, &c.cameras)?;
 
         Ok(false)
     })?;

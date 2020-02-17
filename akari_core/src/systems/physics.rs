@@ -70,7 +70,9 @@ impl PhysicsSystem {
     fn resolve_collisions(&mut self, a: (Entity, ColliderType), b: (Entity, ColliderType)) {
         match (a, b) {
             ((e, ColliderType::Environment), (p, ColliderType::Player))
-            | ((p, ColliderType::Player), (e, ColliderType::Environment)) => {
+            | ((p, ColliderType::Player), (e, ColliderType::Environment))
+            | ((e, ColliderType::CameraRestriction), (p, ColliderType::Camera))
+            | ((p, ColliderType::Camera), (e, ColliderType::CameraRestriction)) => {
                 self.collisions.fixed.push(Collision(e, p))
             }
             ((b, ColliderType::Bridge), (p, ColliderType::Player))
@@ -90,7 +92,11 @@ impl PhysicsSystem {
             | ((_, ColliderType::Bridge), (_, ColliderType::Bridge))
             | ((_, ColliderType::Bridge), (_, ColliderType::PlayerDamage))
             | ((_, ColliderType::PlayerDamage), (_, ColliderType::Bridge))
-            | ((_, ColliderType::PlayerDamage), (_, ColliderType::PlayerDamage)) => {}
+            | ((_, ColliderType::PlayerDamage), (_, ColliderType::PlayerDamage))
+            | ((_, ColliderType::Camera), _)
+            | (_, (_, ColliderType::Camera))
+            | ((_, ColliderType::CameraRestriction), _)
+            | (_, (_, ColliderType::CameraRestriction)) => {}
         }
     }
 }

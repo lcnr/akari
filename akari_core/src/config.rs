@@ -55,6 +55,7 @@ impl<'a, T: DeserializeOwned + Serialize> Config for T {
 pub struct GameConfig {
     pub fps: u32,
     pub window: WindowConfig,
+    pub camera: CameraConfig,
     pub gravity: GravityConfig,
     pub input_buffer: InputBufferConfig,
     pub player: PlayerConfig,
@@ -66,6 +67,11 @@ pub struct WindowConfig {
     pub scale: u32,
     pub title: String,
     pub icon_path: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CameraConfig {
+    pub offset: (f32, f32),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
