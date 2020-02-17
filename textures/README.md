@@ -9,12 +9,14 @@ All textures in this directory are licensed under the [MIT license].
 - [player/idle.png]\: [amantinopixel]
 - [player/run.png]\: [amantinopixel]
 - [player/jump_fall.png]\: [amantinopixel]
+- [player/run_into_obstacle]\: [amantinopixel]
 
 [grassland.png]: grassland.png
 [window_icon.png]: window_icon.png
 [player/idle.png]: player/idle.png
 [player/run.png]: player/run.png
 [player/jump_fall.png]: player/jump_fall.png
+[player/run_into_obstacle]: player/run_into_obstacle.png
 
 
 [amantinopixel]: https://amantinopixel.wordpress.com/
