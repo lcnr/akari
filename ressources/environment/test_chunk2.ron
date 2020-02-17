@@ -2,7 +2,7 @@
     spritesheet: "textures/grassland.png",
     tiles: (
         (Some(Solid), Some(Solid), Some(Solid), Some(Solid), Some(Solid), Some(Solid), Some(Solid), Some(Solid), Some(Solid), Some(Solid), Some(Solid), Some(Solid), Some(Solid), Some(Solid), Some(Solid), Some(Solid)),
-        (None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None),
+        (None, None, None, None, None, None, None, None, None, None, None, Some(Spike), None, None, None, None),
         (None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None),
         (None, None, None, None, None, Some(Solid), Some(Solid), None, None, None, None, None, None, None, None, None),
         (None, None, None, None, None, None, Some(Solid), None, None, None, None, None, None, None, None, None),

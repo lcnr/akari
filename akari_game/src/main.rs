@@ -84,6 +84,8 @@ fn main() -> Result<(), crow::Error> {
 
         s.environment.run(ctx, c, r)?;
 
+        s.fadeout.run(&mut r.fadeout);
+
         s.animation
             .run(&mut c.sprites, &mut c.animations, &mut r.animation_storage);
 

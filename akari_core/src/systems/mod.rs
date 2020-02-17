@@ -4,6 +4,7 @@ mod animation;
 mod bridge_collision;
 mod camera;
 pub mod draw;
+mod fadeout;
 mod fixed_collision;
 mod gravity;
 mod input_buffer;
@@ -14,6 +15,7 @@ pub use crate::environment::EnvironmentSystem;
 pub use animation::AnimationSystem;
 pub use bridge_collision::BridgeCollisionSystem;
 pub use camera::CameraSystem;
+pub use fadeout::FadeoutSystem;
 pub use fixed_collision::FixedCollisionSystem;
 pub use gravity::GravitySystem;
 pub use input_buffer::InputBufferSystem;
@@ -29,6 +31,7 @@ pub struct Systems {
     pub gravity: GravitySystem,
     pub physics: PhysicsSystem,
     pub bridge_collision: BridgeCollisionSystem,
+    pub fadeout: FadeoutSystem,
     pub fixed_collision: FixedCollisionSystem,
     pub player: PlayerStateMachine,
     pub environment: EnvironmentSystem,
@@ -50,6 +53,7 @@ impl Systems {
             gravity: GravitySystem,
             physics: PhysicsSystem::new(),
             bridge_collision: BridgeCollisionSystem,
+            fadeout: FadeoutSystem,
             fixed_collision: FixedCollisionSystem::new(),
             player: PlayerStateMachine,
             environment: EnvironmentSystem,

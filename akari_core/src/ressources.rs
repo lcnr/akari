@@ -17,6 +17,7 @@ pub struct Ressources {
     pub pressed_space: Option<JumpBuffer>,
     pub animation_storage: AnimationStorage,
     pub world: World,
+    pub fadeout: Option<Fadeout>,
     pub lazy_update: LazyUpdate,
 }
 
@@ -29,9 +30,16 @@ impl Ressources {
             pressed_space: None,
             animation_storage: AnimationStorage::new(),
             world: World::new(world_data),
+            fadeout: None,
             lazy_update: Vec::new(),
         }
     }
 }
 
 pub struct JumpBuffer(pub u8);
+
+#[derive(Default, Debug, Clone)]
+pub struct Fadeout {
+    pub current: f32,
+    pub frames_left: usize,
+}

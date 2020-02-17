@@ -8,7 +8,7 @@ use crate::{
         PlayerState, Velocity, WallCollision,
     },
     input::ButtonState,
-    ressources::{JumpBuffer, Ressources},
+    ressources::{Fadeout, JumpBuffer, Ressources},
 };
 
 // FIXME: use a config file instead
@@ -47,6 +47,7 @@ impl PlayerStateMachine {
                     player_animations,
                     &r.animation_storage,
                     &mut c.ignore_bridges,
+                    &mut r.fadeout,
                 );
                 *state = new_state;
             }
@@ -109,6 +110,7 @@ impl PlayerStateMachine {
                     player_animations,
                     &r.animation_storage,
                     &mut c.ignore_bridges,
+                    &mut r.fadeout,
                 );
                 *state = new_state;
             }
@@ -174,6 +176,7 @@ fn initialize_state(
     player_animations: &PlayerAnimations,
     animation_storage: &AnimationStorage,
     ignore_bridges: &mut SparseStorage<IgnoreBridges>,
+    fadeout: &mut Option<Fadeout>,
 ) {
     match state {
         PlayerState::Grounded => {
@@ -191,6 +194,12 @@ fn initialize_state(
             ignore_bridges.remove(player);
 
             // TODO: dying animation
+
+            // TODO: use config for frames_left
+            *fadeout = Some(Fadeout {
+                current: 0.0,
+                frames_left: 40,
+            })
         }
         _ => (),
     }

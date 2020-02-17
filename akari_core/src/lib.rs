@@ -92,12 +92,21 @@ impl GlobalState {
                 break Ok(());
             }
 
+            let fadeout = r.fadeout.as_ref().map_or(0.0, |f| f.current);
+            let color_modulation = [
+                [1.0 - fadeout, 0.0, 0.0, 0.0],
+                [0.0, 1.0 - fadeout, 0.0, 0.0],
+                [0.0, 0.0, 1.0 - fadeout, 0.0],
+                [0.0, 0.0, 0.0, 1.0],
+            ];
+
             ctx.draw(
                 &mut surface,
                 &screen_buffer,
                 (0, 0),
                 &DrawConfig {
                     scale: (r.config.window.scale, r.config.window.scale),
+                    color_modulation,
                     ..Default::default()
                 },
             )?;
