@@ -5,14 +5,14 @@ use crow_anim::{AnimationState, AnimationStorage};
 use crate::{
     data::{
         Collision, Collisions, Components, Grounded, IgnoreBridges, Mirrored, PlayerAnimations,
-        PlayerState, Velocity,
+        PlayerState, Velocity, WallCollision,
     },
     input::ButtonState,
     ressources::{JumpBuffer, Ressources},
 };
 
 // FIXME: use a config file instead
-const RUNNING_THRESHHOLD: f32 = 5.0;
+const RUNNING_THRESHHOLD: f32 = 15.0;
 
 #[derive(Debug)]
 pub struct PlayerStateMachine;
@@ -22,12 +22,13 @@ impl PlayerStateMachine {
         #[cfg(feature = "profiler")]
         profile_scope!("run");
 
-        for (state, animation, player_animations, velocity, grounded, entity) in (
+        for (state, animation, player_animations, velocity, grounded, wall_collision, entity) in (
             &mut c.player_state,
             &mut c.animations,
             &c.player_animations,
             &mut c.velocities,
             (&c.grounded).maybe(),
+            (&c.wall_collisions).maybe(),
             Entities,
         )
             .join()
@@ -140,13 +141,25 @@ impl PlayerStateMachine {
                 *animation = r.animation_storage.start(player_animations.start_falling);
             }
 
+            if animation.current == player_animations.run_into_obstacle && wall_collision == None {
+                *animation = r.animation_storage.start(player_animations.idle);
+            }
+
             if *state == PlayerState::Grounded {
                 if velocity.x.abs() >= RUNNING_THRESHHOLD {
                     if animation.current == player_animations.idle {
                         *animation = r.animation_storage.start(player_animations.running);
                     }
                 } else if animation.current == player_animations.running {
-                    *animation = r.animation_storage.start(player_animations.idle);
+                    if animation.current == player_animations.running
+                        && wall_collision == Some(&WallCollision)
+                    {
+                        *animation = r
+                            .animation_storage
+                            .start(player_animations.run_into_obstacle);
+                    } else {
+                        *animation = r.animation_storage.start(player_animations.idle);
+                    }
                 }
             }
         }

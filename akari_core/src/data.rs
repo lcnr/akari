@@ -133,6 +133,7 @@ pub enum PlayerState {
 pub struct PlayerAnimations {
     pub idle: AnimationHandle,
     pub running: AnimationHandle,
+    pub run_into_obstacle: AnimationHandle,
     /// run once after jumping -> falling,
     pub jumping: AnimationHandle,
     /// run once during a jump/fall -> falling,
@@ -254,10 +255,7 @@ pub struct IgnoreBridges;
 pub struct Mirrored;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
-pub enum WallCollision {
-    Right,
-    Left,
-}
+pub struct WallCollision;
 
 #[derive(Default, Debug, Clone)]
 pub struct Camera;

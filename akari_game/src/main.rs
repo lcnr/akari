@@ -99,7 +99,7 @@ fn main() -> Result<(), crow::Error> {
             &c.colliders,
             &c.cameras,
         )?;
-        draw::debug_colliders(ctx, screen_buffer, &c.positions, &c.colliders, &c.cameras)?;
+        //draw::debug_colliders(ctx, screen_buffer, &c.positions, &c.colliders, &c.cameras)?;
 
         Ok(false)
     })?;

@@ -9,7 +9,7 @@ All textures in this directory are licensed under the [MIT license].
 - [player/idle.png]\: [amantinopixel]
 - [player/run.png]\: [amantinopixel]
 - [player/jump_fall.png]\: [amantinopixel]
-- [player/run_into_obstacle]\: [amantinopixel]
+- [player/run_into_obstacle]\: [amantinopixel], modified by [Bastian Kauschke]
 
 [grassland.png]: grassland.png
 [window_icon.png]: window_icon.png
@@ -20,5 +20,6 @@ All textures in this directory are licensed under the [MIT license].
 
 
 [amantinopixel]: https://amantinopixel.wordpress.com/
+[Bastian Kauschke]: https://github.com/lcnr
 
 [MIT license]: ../LICENSE

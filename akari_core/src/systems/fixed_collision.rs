@@ -363,7 +363,7 @@ fn resolve_collision(
             velocities.get_mut(other).unwrap_or(&mut other_vel).x = unscaled_solid_vel.x;
             match solid_col.ty {
                 ColliderType::Bridge | ColliderType::Environment => {
-                    wall_collisions.insert(other, WallCollision::Left)
+                    wall_collisions.insert(other, WallCollision)
                 }
                 ColliderType::Player
                 | ColliderType::PlayerDamage
@@ -377,7 +377,7 @@ fn resolve_collision(
             velocities.get_mut(other).unwrap_or(&mut other_vel).x = unscaled_solid_vel.x;
             match solid_col.ty {
                 ColliderType::Bridge | ColliderType::Environment => {
-                    wall_collisions.insert(other, WallCollision::Right)
+                    wall_collisions.insert(other, WallCollision)
                 }
                 ColliderType::Player
                 | ColliderType::PlayerDamage
