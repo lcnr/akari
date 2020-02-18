@@ -1,7 +1,3 @@
-#[cfg(feature = "profiler")]
-#[macro_use]
-extern crate thread_profiler;
-
 use akari_core::{
     config::{Config, GameConfig},
     environment::WorldData,
