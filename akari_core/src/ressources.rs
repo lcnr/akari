@@ -51,14 +51,14 @@ pub struct Fadeout {
     pub frames_left: usize,
 }
 
+pub type Action = dyn FnOnce(
+    &mut Context,
+    &mut Systems,
+    &mut Components,
+    &mut Ressources,
+) -> Result<(), crow::Error>;
+
 pub struct DelayedAction {
     pub frames_left: usize,
-    pub action: Box<
-        dyn FnOnce(
-            &mut Context,
-            &mut Systems,
-            &mut Components,
-            &mut Ressources,
-        ) -> Result<(), crow::Error>,
-    >,
+    pub action: Box<Action>,
 }
