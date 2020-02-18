@@ -7,8 +7,9 @@ use crate::{
         Collision, Collisions, Components, Grounded, IgnoreBridges, Mirrored, PlayerAnimations,
         PlayerState, Velocity, WallCollision,
     },
+    init,
     input::ButtonState,
-    ressources::{Fadeout, JumpBuffer, Ressources},
+    ressources::{DelayedAction, Fadeout, JumpBuffer, Ressources},
 };
 
 // FIXME: use a config file instead
@@ -48,6 +49,7 @@ impl PlayerStateMachine {
                     &r.animation_storage,
                     &mut c.ignore_bridges,
                     &mut r.fadeout,
+                    &mut r.delayed_actions,
                 );
                 *state = new_state;
             }
@@ -111,6 +113,7 @@ impl PlayerStateMachine {
                     &r.animation_storage,
                     &mut c.ignore_bridges,
                     &mut r.fadeout,
+                    &mut r.delayed_actions,
                 );
                 *state = new_state;
             }
@@ -177,6 +180,7 @@ fn initialize_state(
     animation_storage: &AnimationStorage,
     ignore_bridges: &mut SparseStorage<IgnoreBridges>,
     fadeout: &mut Option<Fadeout>,
+    delayed_actions: &mut Vec<DelayedAction>,
 ) {
     match state {
         PlayerState::Grounded => {
@@ -196,10 +200,21 @@ fn initialize_state(
             // TODO: dying animation
 
             // TODO: use config for frames_left
+            let frames_left = 40;
             *fadeout = Some(Fadeout {
                 current: 0.0,
-                frames_left: 40,
-            })
+                frames_left,
+            });
+            delayed_actions.push(DelayedAction {
+                frames_left,
+                action: Box::new(|ctx, s, c, r| {
+                    *c = Components::new();
+                    r.reset();
+                    init::player(ctx, c, r)?;
+                    init::camera(c, r);
+                    s.environment.run(ctx, c, r)
+                }),
+            });
         }
         _ => (),
     }

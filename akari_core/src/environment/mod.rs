@@ -65,6 +65,10 @@ impl World {
             chunks: Vec::new(),
         }
     }
+
+    pub fn reset(&mut self) {
+        self.chunks.clear();
+    }
 }
 
 #[derive(Debug)]

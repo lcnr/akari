@@ -1,3 +1,5 @@
+use crow::Context;
+
 use crow_anim::AnimationStorage;
 
 use crate::{
@@ -5,10 +7,9 @@ use crate::{
     data::Components,
     environment::{World, WorldData},
     input::InputState,
+    systems::Systems,
     time::Time,
 };
-
-pub type LazyUpdate = Vec<Box<dyn FnOnce(&mut Components, &mut Ressources)>>;
 
 pub struct Ressources {
     pub input_state: InputState,
@@ -18,7 +19,7 @@ pub struct Ressources {
     pub animation_storage: AnimationStorage,
     pub world: World,
     pub fadeout: Option<Fadeout>,
-    pub lazy_update: LazyUpdate,
+    pub delayed_actions: Vec<DelayedAction>,
 }
 
 impl Ressources {
@@ -31,8 +32,14 @@ impl Ressources {
             animation_storage: AnimationStorage::new(),
             world: World::new(world_data),
             fadeout: None,
-            lazy_update: Vec::new(),
+            delayed_actions: Vec::new(),
         }
+    }
+
+    pub fn reset(&mut self) {
+        self.fadeout = None;
+        self.delayed_actions.clear();
+        self.world.reset();
     }
 }
 
@@ -42,4 +49,16 @@ pub struct JumpBuffer(pub u8);
 pub struct Fadeout {
     pub current: f32,
     pub frames_left: usize,
+}
+
+pub struct DelayedAction {
+    pub frames_left: usize,
+    pub action: Box<
+        dyn FnOnce(
+            &mut Context,
+            &mut Systems,
+            &mut Components,
+            &mut Ressources,
+        ) -> Result<(), crow::Error>,
+    >,
 }

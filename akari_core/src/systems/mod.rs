@@ -1,5 +1,7 @@
 use std::mem;
 
+use crow::Context;
+
 mod animation;
 mod bridge_collision;
 mod camera;
@@ -22,7 +24,10 @@ pub use input_buffer::InputBufferSystem;
 pub use physics::PhysicsSystem;
 pub use player::PlayerStateMachine;
 
-use crate::{data::Components, ressources::Ressources};
+use crate::{
+    data::Components,
+    ressources::{DelayedAction, Ressources},
+};
 
 #[derive(Debug)]
 pub struct Systems {
@@ -36,7 +41,6 @@ pub struct Systems {
     pub player: PlayerStateMachine,
     pub environment: EnvironmentSystem,
     pub animation: AnimationSystem,
-    pub lazy_update: LazyUpdateSystem,
 }
 
 impl Default for Systems {
@@ -58,18 +62,29 @@ impl Systems {
             player: PlayerStateMachine,
             environment: EnvironmentSystem,
             animation: AnimationSystem,
-            lazy_update: LazyUpdateSystem,
         }
     }
-}
 
-#[derive(Debug)]
-pub struct LazyUpdateSystem;
+    pub fn delayed_actions(
+        &mut self,
+        ctx: &mut Context,
+        c: &mut Components,
+        r: &mut Ressources,
+    ) -> Result<(), crow::Error> {
+        let actions = mem::replace(&mut r.delayed_actions, Vec::new()).into_iter();
+        r.delayed_actions = actions
+            .filter_map(|a| {
+                if let Some(frames_left) = a.frames_left.checked_sub(1) {
+                    Some(Ok(DelayedAction { frames_left, ..a }))
+                } else {
+                    match (a.action)(ctx, self, c, r) {
+                        Ok(()) => None,
+                        Err(err) => Some(Err(err)),
+                    }
+                }
+            })
+            .collect::<Result<_, _>>()?;
 
-impl LazyUpdateSystem {
-    pub fn run(&mut self, c: &mut Components, r: &mut Ressources) {
-        for update in mem::replace(&mut r.lazy_update, Vec::new()) {
-            update(c, r);
-        }
+        Ok(())
     }
 }

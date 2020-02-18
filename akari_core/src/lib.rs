@@ -19,6 +19,7 @@ use crow::{
 pub mod config;
 pub mod data;
 pub mod environment;
+pub mod init;
 pub mod input;
 pub mod physics;
 pub mod ressources;

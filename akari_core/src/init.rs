@@ -1,6 +1,6 @@
 use crow::Context;
 
-use akari_core::{
+use crate::{
     config::{Config, PlayerAnimationsConfig},
     data::{
         Camera, Collider, ColliderType, Components, Depth, Gravity, PlayerAnimations, PlayerState,

@@ -5,11 +5,10 @@ extern crate thread_profiler;
 use akari_core::{
     config::{Config, GameConfig},
     environment::WorldData,
+    init,
     systems::draw,
     GlobalState,
 };
-
-mod init;
 
 fn main() -> Result<(), crow::Error> {
     pretty_env_logger::formatted_timed_builder()
@@ -89,7 +88,7 @@ fn main() -> Result<(), crow::Error> {
         s.animation
             .run(&mut c.sprites, &mut c.animations, &mut r.animation_storage);
 
-        s.lazy_update.run(c, r);
+        s.delayed_actions(ctx, c, r)?;
 
         draw::scene(
             ctx,
