@@ -10,6 +10,20 @@ This project is quite early in development and is therefore not yet in a playabl
 
 [MIT license]: ./LICENSE
 
+## Getting started
+
+To test this game, download/clone this repository and use the command `cargo run` to compile and run this program.
+
+### Controls
+
+- `a`: move left
+- `d`: move right
+- `s`: fall through bridges
+- `space`: jump
+- `t`: toggle debug colliders
+
+The actual bindings can be changed by editing `ressources/game_config.ron`.
+
 ## Design
 
 A high intensity 2D hack and slay platformer with a large focus on dodging attacks.

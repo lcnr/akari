@@ -1,6 +1,6 @@
 use crate::{
-    config::InputBufferConfig,
-    input::{InputEvent, Key},
+    config::{InputBufferConfig, InputConfig},
+    input::InputEvent,
     ressources::JumpBuffer,
 };
 
@@ -12,7 +12,8 @@ impl InputBufferSystem {
         &mut self,
         events: &[InputEvent],
         space: &mut Option<JumpBuffer>,
-        config: &InputBufferConfig,
+        buffer_config: &InputBufferConfig,
+        input_config: &InputConfig,
     ) {
         #[cfg(feature = "profiler")]
         profile_scope!("run");
@@ -22,8 +23,8 @@ impl InputBufferSystem {
         }
 
         for event in events {
-            if let InputEvent::KeyDown(Key::Space) = event {
-                *space = Some(JumpBuffer(config.jump_buffer_frames))
+            if &InputEvent::KeyDown(input_config.jump) == event {
+                *space = Some(JumpBuffer(buffer_config.jump_buffer_frames))
             }
         }
     }

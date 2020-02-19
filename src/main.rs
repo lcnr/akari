@@ -26,15 +26,24 @@ fn main() -> Result<(), crow::Error> {
         .environment
         .run(&mut game.ctx, &mut game.c, &mut game.r)?;
 
+    let mut debug_draw = false;
+
     game.run(|ctx, screen_buffer, s, r, c| {
         if r.input_state.update(ctx.events_loop()) {
             return Ok(true);
+        }
+
+        for event in r.input_state.events() {
+            if &akari::input::InputEvent::KeyDown(r.config.input.debug_toggle) == event {
+                debug_draw = !debug_draw;
+            }
         }
 
         s.input_buffer.run(
             r.input_state.events(),
             &mut r.pressed_space,
             &r.config.input_buffer,
+            &r.config.input,
         );
 
         s.camera.run(
@@ -98,7 +107,10 @@ fn main() -> Result<(), crow::Error> {
             &c.colliders,
             &c.cameras,
         )?;
-        //draw::debug_colliders(ctx, screen_buffer, &c.positions, &c.colliders, &c.cameras)?;
+
+        if debug_draw {
+            draw::debug_colliders(ctx, screen_buffer, &c.positions, &c.colliders, &c.cameras)?;
+        }
 
         Ok(false)
     })?;

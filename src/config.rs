@@ -75,6 +75,9 @@ pub struct InputConfig {
     pub down: Key,
     pub right: Key,
     pub left: Key,
+    pub jump: Key,
+    /// TODO: remove me before releasing this game
+    pub debug_toggle: Key,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

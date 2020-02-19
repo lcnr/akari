@@ -10,6 +10,8 @@
         down: S,
         right: D,
         left: A,
+        jump: Space,
+        debug_toggle: T,
     ),
     camera: (
         offset: (100.0, 100.0),
