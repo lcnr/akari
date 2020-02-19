@@ -1,4 +1,4 @@
-use akari_core::{
+use akari::{
     config::{Config, GameConfig},
     environment::WorldData,
     init,

@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "akari_core"
+name = "akari"
 version = "0.1.0"
 dependencies = [
  "crow",
@@ -24,19 +24,9 @@ dependencies = [
  "crow_ecs",
  "log",
  "ordered-float",
+ "pretty_env_logger",
  "ron",
  "serde",
- "thread_profiler",
-]
-
-[[package]]
-name = "akari_game"
-version = "0.1.0"
-dependencies = [
- "akari_core",
- "crow",
- "log",
- "pretty_env_logger",
  "thread_profiler",
 ]
 
