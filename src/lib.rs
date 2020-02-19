@@ -23,13 +23,14 @@ pub mod init;
 pub mod input;
 pub mod physics;
 pub mod ressources;
+pub mod save;
 pub mod spritesheet;
 pub mod systems;
 pub mod time;
 
 use crate::{
     config::GameConfig, data::Components, environment::WorldData, ressources::Ressources,
-    systems::Systems,
+    save::SaveData, systems::Systems,
 };
 
 pub struct GlobalState {
@@ -40,7 +41,11 @@ pub struct GlobalState {
 }
 
 impl GlobalState {
-    pub fn new(config: GameConfig, world_data: WorldData) -> Result<Self, crow::Error> {
+    pub fn new(
+        config: GameConfig,
+        world_data: WorldData,
+        save_data: SaveData,
+    ) -> Result<Self, crow::Error> {
         let icon = load_window_icon(&config.window.icon_path).unwrap();
 
         let ctx = Context::new(
@@ -56,7 +61,7 @@ impl GlobalState {
 
         Ok(GlobalState {
             s: Systems::new(),
-            r: Ressources::new(config, world_data),
+            r: Ressources::new(config, world_data, save_data),
             c: Components::new(),
             ctx,
         })

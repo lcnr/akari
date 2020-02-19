@@ -19,7 +19,7 @@ pub fn player(
 
     let player = c.new_entity();
 
-    c.positions.insert(player, Position { x: 50.0, y: 100.0 });
+    c.positions.insert(player, r.last_save.position);
     c.colliders.insert(
         player,
         Collider {

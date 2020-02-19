@@ -7,6 +7,7 @@ use crate::{
     data::Components,
     environment::{World, WorldData},
     input::InputState,
+    save::SaveData,
     systems::Systems,
     time::Time,
 };
@@ -20,10 +21,11 @@ pub struct Ressources {
     pub world: World,
     pub fadeout: Option<Fadeout>,
     pub delayed_actions: Vec<DelayedAction>,
+    pub last_save: SaveData,
 }
 
 impl Ressources {
-    pub fn new(config: GameConfig, world_data: WorldData) -> Self {
+    pub fn new(config: GameConfig, world_data: WorldData, last_save: SaveData) -> Self {
         Ressources {
             input_state: InputState::new(),
             time: Time::new(config.fps),
@@ -33,6 +35,7 @@ impl Ressources {
             world: World::new(world_data),
             fadeout: None,
             delayed_actions: Vec::new(),
+            last_save,
         }
     }
 

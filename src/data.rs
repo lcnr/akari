@@ -3,6 +3,8 @@ use std::{
     ops::{BitAnd, Mul, Sub},
 };
 
+use serde::{Deserialize, Serialize};
+
 use crow_ecs::{Entity, SparseStorage, Storage};
 
 use crow_anim::{AnimationHandle, AnimationState, Sprite};
@@ -63,7 +65,7 @@ impl Components {
     }
 }
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, Deserialize, Serialize)]
 pub struct Position {
     pub x: f32,
     pub y: f32,

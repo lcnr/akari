@@ -2,6 +2,7 @@ use akari::{
     config::{Config, GameConfig},
     environment::WorldData,
     init,
+    save::SaveData,
     systems::draw,
     GlobalState,
 };
@@ -16,7 +17,8 @@ fn main() -> Result<(), crow::Error> {
 
     let config = GameConfig::load("ressources/game_config.ron").unwrap();
     let world_data = WorldData::load("ressources/environment/world.ron").unwrap();
-    let mut game = GlobalState::new(config, world_data)?;
+    let save_data = SaveData::load("ressources/save/test_save.ron").unwrap();
+    let mut game = GlobalState::new(config, world_data, save_data)?;
 
     init::player(&mut game.ctx, &mut game.c, &mut game.r)?;
     init::camera(&mut game.c, &mut game.r);
