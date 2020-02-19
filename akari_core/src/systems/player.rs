@@ -8,7 +8,7 @@ use crate::{
         PlayerState, Velocity, WallCollision,
     },
     init,
-    input::ButtonState,
+    input::KeyState,
     ressources::{DelayedAction, Fadeout, JumpBuffer, Ressources},
 };
 
@@ -56,14 +56,16 @@ impl PlayerStateMachine {
 
             match *state {
                 PlayerState::Grounded | PlayerState::Airborne => {
-                    let direction = match (r.input_state.left, r.input_state.right) {
-                        (ButtonState::Down, ButtonState::Down)
-                        | (ButtonState::Up, ButtonState::Up) => 0.0,
-                        (ButtonState::Down, ButtonState::Up) => {
+                    let direction = match (
+                        r.input_state.key(r.config.input.left),
+                        r.input_state.key(r.config.input.right),
+                    ) {
+                        (KeyState::Down, KeyState::Down) | (KeyState::Up, KeyState::Up) => 0.0,
+                        (KeyState::Down, KeyState::Up) => {
                             c.mirrored.insert(entity, Mirrored);
                             -1.0
                         }
-                        (ButtonState::Up, ButtonState::Down) => {
+                        (KeyState::Up, KeyState::Down) => {
                             c.mirrored.remove(entity);
                             1.0
                         }
@@ -130,7 +132,7 @@ impl PlayerStateMachine {
 
             match state {
                 PlayerState::Grounded | PlayerState::Airborne => {
-                    if r.input_state.down == ButtonState::Down {
+                    if r.input_state.key(r.config.input.down) == KeyState::Down {
                         c.ignore_bridges.insert(entity, IgnoreBridges);
                     } else {
                         c.ignore_bridges.remove(entity);

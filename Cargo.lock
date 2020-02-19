@@ -283,13 +283,14 @@ dependencies = [
 
 [[package]]
 name = "crow"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c5ceefdb5eafe90ff58e30057fe8f5f0714585abe78616348d762ee599c49938"
+checksum = "e4ba2caee7ee8ad8ddbe422cab97a536c38548356db02380e22490ad73b765f9"
 dependencies = [
  "gl",
  "glutin",
  "image",
+ "serde",
  "static_assertions",
 ]
 
@@ -1291,6 +1292,7 @@ dependencies = [
  "parking_lot",
  "percent-encoding",
  "raw-window-handle",
+ "serde",
  "smithay-client-toolkit",
  "wayland-client",
  "winapi",

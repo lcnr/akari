@@ -8,7 +8,7 @@ use crow::{Context, LoadTextureError};
 
 use crow_anim::{Animation, AnimationHandle, AnimationStorage};
 
-use crate::{data::PlayerAnimations, spritesheet::SpriteSheet};
+use crate::{data::PlayerAnimations, input::Key, spritesheet::SpriteSheet};
 
 #[derive(Debug)]
 pub enum LoadError {
@@ -55,6 +55,7 @@ impl<'a, T: DeserializeOwned + Serialize> Config for T {
 pub struct GameConfig {
     pub fps: u32,
     pub window: WindowConfig,
+    pub input: InputConfig,
     pub camera: CameraConfig,
     pub gravity: GravityConfig,
     pub input_buffer: InputBufferConfig,
@@ -67,6 +68,13 @@ pub struct WindowConfig {
     pub scale: u32,
     pub title: String,
     pub icon_path: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct InputConfig {
+    pub down: Key,
+    pub right: Key,
+    pub left: Key,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

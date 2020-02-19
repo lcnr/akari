@@ -1,35 +1,22 @@
-use crow::glutin::{
-    ElementState, Event, EventsLoop, KeyboardInput, VirtualKeyCode as Key, WindowEvent,
-};
+use crow::glutin::{ElementState, Event, EventsLoop, KeyboardInput, WindowEvent};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Button {
-    Space,
-}
+pub use crow::glutin::VirtualKeyCode as Key;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InputEvent {
-    ButtonDown(Button),
-    ButtonUp(Button),
+    KeyDown(Key),
+    KeyUp(Key),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ButtonState {
+pub enum KeyState {
     Down,
     Up,
 }
 
-impl Default for ButtonState {
-    fn default() -> Self {
-        ButtonState::Up
-    }
-}
-
 #[derive(Debug, Clone, Default)]
 pub struct InputState {
-    pub down: ButtonState,
-    pub left: ButtonState,
-    pub right: ButtonState,
+    pressed: Vec<Key>,
     events: Vec<InputEvent>,
 }
 
@@ -54,13 +41,12 @@ impl InputState {
                                 ..
                             },
                         ..
-                    } => match key {
-                        Key::Space => self.events.push(InputEvent::ButtonDown(Button::Space)),
-                        Key::S => self.down = ButtonState::Down,
-                        Key::A => self.left = ButtonState::Down,
-                        Key::D => self.right = ButtonState::Down,
-                        _ => (),
-                    },
+                    } => {
+                        if !self.pressed.contains(&key) {
+                            self.pressed.push(key);
+                            self.events.push(InputEvent::KeyDown(key));
+                        }
+                    }
                     WindowEvent::KeyboardInput {
                         input:
                             KeyboardInput {
@@ -69,19 +55,26 @@ impl InputState {
                                 ..
                             },
                         ..
-                    } => match key {
-                        Key::Space => self.events.push(InputEvent::ButtonUp(Button::Space)),
-                        Key::S => self.down = ButtonState::Up,
-                        Key::A => self.left = ButtonState::Up,
-                        Key::D => self.right = ButtonState::Up,
-                        _ => (),
-                    },
+                    } => {
+                        if let Some(idx) = self.pressed.iter().position(|&i| i == key) {
+                            self.pressed.remove(idx);
+                            self.events.push(InputEvent::KeyUp(key));
+                        }
+                    }
                     _ => (),
                 }
             }
         });
 
         fin
+    }
+
+    pub fn key(&self, key: Key) -> KeyState {
+        if self.pressed.contains(&key) {
+            KeyState::Down
+        } else {
+            KeyState::Up
+        }
     }
 
     pub fn events(&self) -> &[InputEvent] {

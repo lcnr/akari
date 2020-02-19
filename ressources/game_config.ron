@@ -6,6 +6,11 @@
         title: "Akari",
         icon_path: "textures/window_icon.png",
     ),
+    input: (
+        down: S,
+        right: D,
+        left: A,
+    ),
     camera: (
         offset: (100.0, 100.0),
     ),

@@ -1,6 +1,6 @@
 use crate::{
     config::InputBufferConfig,
-    input::{Button, InputEvent},
+    input::{InputEvent, Key},
     ressources::JumpBuffer,
 };
 
@@ -22,7 +22,7 @@ impl InputBufferSystem {
         }
 
         for event in events {
-            if let InputEvent::ButtonDown(Button::Space) = event {
+            if let InputEvent::KeyDown(Key::Space) = event {
                 *space = Some(JumpBuffer(config.jump_buffer_frames))
             }
         }
