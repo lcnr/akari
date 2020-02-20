@@ -1,11 +1,15 @@
 use crow::glutin::{ElementState, Event, EventsLoop, KeyboardInput, WindowEvent};
 
-pub use crow::glutin::VirtualKeyCode as Key;
+pub use crow::glutin::{MouseButton, VirtualKeyCode as Key};
+
+use crate::config::WindowConfig;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InputEvent {
     KeyDown(Key),
     KeyUp(Key),
+    MouseDown(MouseButton),
+    MouseUp(MouseButton),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -17,7 +21,9 @@ pub enum KeyState {
 #[derive(Debug, Clone, Default)]
 pub struct InputState {
     pressed: Vec<Key>,
+    mouse_pressed: Vec<MouseButton>,
     events: Vec<InputEvent>,
+    cursor_position: (i32, i32),
 }
 
 impl InputState {
@@ -25,7 +31,7 @@ impl InputState {
         Default::default()
     }
 
-    pub fn update(&mut self, events_loop: &mut EventsLoop) -> bool {
+    pub fn update(&mut self, events_loop: &mut EventsLoop, window_config: &WindowConfig) -> bool {
         self.events.clear();
         let mut fin = false;
 
@@ -61,6 +67,35 @@ impl InputState {
                             self.events.push(InputEvent::KeyUp(key));
                         }
                     }
+                    WindowEvent::MouseInput {
+                        state: ElementState::Pressed,
+                        button,
+                        ..
+                    } => {
+                        if !self.mouse_pressed.contains(&button) {
+                            self.mouse_pressed.push(button);
+                            self.events.push(InputEvent::MouseDown(button));
+                        }
+                    }
+                    WindowEvent::MouseInput {
+                        state: ElementState::Released,
+                        button,
+                        ..
+                    } => {
+                        if let Some(idx) = self.mouse_pressed.iter().position(|&i| i == button) {
+                            self.mouse_pressed.remove(idx);
+                            self.events.push(InputEvent::MouseUp(button));
+                        }
+                    }
+                    WindowEvent::CursorMoved { position, .. } => {
+                        let position: (i32, i32) = position.into();
+                        let scaled_pos = (
+                            position.0 / window_config.scale as i32,
+                            position.1 / window_config.scale as i32,
+                        );
+                        self.cursor_position =
+                            (scaled_pos.0, window_config.size.1 as i32 - scaled_pos.1);
+                    }
                     _ => (),
                 }
             }
@@ -77,7 +112,19 @@ impl InputState {
         }
     }
 
+    pub fn mouse(&self, button: MouseButton) -> KeyState {
+        if self.mouse_pressed.contains(&button) {
+            KeyState::Down
+        } else {
+            KeyState::Up
+        }
+    }
+
     pub fn events(&self) -> &[InputEvent] {
         &self.events
+    }
+
+    pub fn cursor_position(&self) -> (i32, i32) {
+        self.cursor_position
     }
 }

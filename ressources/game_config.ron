@@ -12,6 +12,7 @@
         left: A,
         jump: Space,
         debug_toggle: T,
+        editor_tile: Tab,
     ),
     camera: (
         offset: (100.0, 100.0),

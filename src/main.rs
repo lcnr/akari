@@ -29,7 +29,7 @@ fn main() -> Result<(), crow::Error> {
     let mut debug_draw = false;
 
     game.run(|ctx, screen_buffer, s, r, c| {
-        if r.input_state.update(ctx.events_loop()) {
+        if r.input_state.update(ctx.events_loop(), &r.config.window) {
             return Ok(true);
         }
 
@@ -96,6 +96,9 @@ fn main() -> Result<(), crow::Error> {
             .run(&mut c.sprites, &mut c.animations, &mut r.animation_storage);
 
         s.delayed_actions(ctx, c, r)?;
+
+        #[cfg(feature = "editor")]
+        s.editor.run(ctx, c, r)?;
 
         draw::scene(
             ctx,

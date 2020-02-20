@@ -78,6 +78,8 @@ pub struct InputConfig {
     pub jump: Key,
     /// TODO: remove me before releasing this game
     pub debug_toggle: Key,
+    /// TODO: remove me
+    pub editor_tile: Key,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

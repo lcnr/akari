@@ -273,9 +273,9 @@ dependencies = [
 
 [[package]]
 name = "crow"
-version = "0.3.1"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e4ba2caee7ee8ad8ddbe422cab97a536c38548356db02380e22490ad73b765f9"
+checksum = "0f9013f4b60b96dee9eaddb7ec11b905a706c22a0b4596a17ad611d5cdb347f2"
 dependencies = [
  "gl",
  "glutin",

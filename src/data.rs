@@ -71,6 +71,12 @@ pub struct Position {
     pub y: f32,
 }
 
+impl From<Position> for (i32, i32) {
+    fn from(position: Position) -> Self {
+        (position.x.round() as i32, position.y.round() as i32)
+    }
+}
+
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Velocity {
     pub x: f32,

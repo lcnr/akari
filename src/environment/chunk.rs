@@ -12,10 +12,19 @@ use crate::{
     spritesheet::SpriteSheet,
 };
 
-#[derive(Debug, Default, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ChunkData {
     pub spritesheet: String,
     pub tiles: [[Option<Tile>; CHUNK_TILES]; CHUNK_TILES],
+}
+
+impl Default for ChunkData {
+    fn default() -> Self {
+        ChunkData {
+            spritesheet: String::from("textures/grassland.png"),
+            tiles: [[None; CHUNK_TILES]; CHUNK_TILES],
+        }
+    }
 }
 
 impl ChunkData {
@@ -151,6 +160,8 @@ impl ChunkData {
 pub struct Chunk {
     pub position: (i32, i32),
     pub tiles: Vec<Entity>,
+    #[cfg(feature = "editor")]
+    pub data: ChunkData,
 }
 
 impl Drop for Chunk {
@@ -184,25 +195,49 @@ impl Chunk {
             },
         );
 
-        Chunk { position, tiles }
+        Chunk {
+            position,
+            tiles,
+            #[cfg(feature = "editor")]
+            data: ChunkData::default(),
+        }
+    }
+
+    #[cfg(feature = "editor")]
+    pub fn rebuild(&mut self, ctx: &mut Context, c: &mut Components) -> Result<(), crow::Error> {
+        self.clear(c);
+
+        let spritesheet = Self::build_spritesheet(ctx, &self.data.spritesheet).unwrap();
+        // TODO: stop cloning data
+        let data = self.data.clone();
+
+        for (y, line) in data.tiles.iter().enumerate() {
+            for x in 0..line.len() {
+                self.add_tile((x, y), &data, c, &spritesheet);
+            }
+        }
+
+        Ok(())
     }
 
     pub fn new(
         ctx: &mut Context,
         position: (i32, i32),
-        config: ChunkData,
+        data: ChunkData,
         c: &mut Components,
     ) -> Result<Self, crow::Error> {
-        let spritesheet = Self::build_spritesheet(ctx, &config.spritesheet).unwrap();
+        let spritesheet = Self::build_spritesheet(ctx, &data.spritesheet).unwrap();
 
         let mut chunk = Chunk {
             position,
             tiles: Vec::new(),
+            #[cfg(feature = "editor")]
+            data: data.clone(),
         };
 
-        for (y, line) in config.tiles.iter().enumerate() {
+        for (y, line) in data.tiles.iter().enumerate() {
             for x in 0..line.len() {
-                chunk.add_tile((x, y), &config, c, &spritesheet);
+                chunk.add_tile((x, y), &data, c, &spritesheet);
             }
         }
 

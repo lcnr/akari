@@ -13,6 +13,9 @@ mod input_buffer;
 mod physics;
 mod player;
 
+#[cfg(feature = "editor")]
+mod editor;
+
 pub use crate::environment::EnvironmentSystem;
 pub use animation::AnimationSystem;
 pub use bridge_collision::BridgeCollisionSystem;
@@ -23,6 +26,9 @@ pub use gravity::GravitySystem;
 pub use input_buffer::InputBufferSystem;
 pub use physics::PhysicsSystem;
 pub use player::PlayerStateMachine;
+
+#[cfg(feature = "editor")]
+pub use editor::EditorSystem;
 
 use crate::{
     data::Components,
@@ -41,6 +47,8 @@ pub struct Systems {
     pub player: PlayerStateMachine,
     pub environment: EnvironmentSystem,
     pub animation: AnimationSystem,
+    #[cfg(feature = "editor")]
+    pub editor: EditorSystem,
 }
 
 impl Default for Systems {
@@ -62,6 +70,8 @@ impl Systems {
             player: PlayerStateMachine,
             environment: EnvironmentSystem,
             animation: AnimationSystem,
+            #[cfg(feature = "editor")]
+            editor: EditorSystem::new(),
         }
     }
 
