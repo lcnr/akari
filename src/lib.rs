@@ -73,8 +73,8 @@ impl GlobalState {
             &mut Context,
             &mut Texture,
             &mut Systems,
-            &mut Ressources,
             &mut Components,
+            &mut Ressources,
         ) -> Result<bool, crow::Error>,
     {
         let GlobalState {
@@ -94,7 +94,11 @@ impl GlobalState {
             ctx.clear_color(&mut screen_buffer, (0.3, 0.3, 0.8, 1.0))?;
             screen_buffer.clear_depth(&mut ctx)?;
 
-            if frame(&mut ctx, &mut screen_buffer, &mut s, &mut r, &mut c)? {
+            if r.input_state.update(ctx.events_loop(), &r.config.window) {
+                break Ok(());
+            }
+
+            if frame(&mut ctx, &mut screen_buffer, &mut s, &mut c, &mut r)? {
                 break Ok(());
             }
 
@@ -120,6 +124,98 @@ impl GlobalState {
             r.time.frame();
         }
     }
+}
+
+pub fn game_frame(
+    ctx: &mut Context,
+    screen_buffer: &mut Texture,
+    s: &mut Systems,
+    c: &mut Components,
+    r: &mut Ressources,
+) -> Result<bool, crow::Error> {
+    for event in r.input_state.events() {
+        if &input::InputEvent::KeyDown(r.config.input.debug_toggle) == event {
+            r.debug_draw = !r.debug_draw;
+        }
+    }
+
+    s.input_buffer.run(
+        r.input_state.events(),
+        &mut r.pressed_space,
+        &r.config.input_buffer,
+        &r.config.input,
+    );
+
+    s.camera.run(
+        &c.player_state,
+        &c.positions,
+        &c.previous_positions,
+        &mut c.velocities,
+        &c.cameras,
+        &r.time,
+        &r.config.camera,
+    );
+
+    s.gravity
+        .run(&c.gravity, &mut c.velocities, &r.time, &r.config.gravity);
+
+    let mut collisions = s.physics.run(
+        &c.velocities,
+        &c.colliders,
+        &mut c.previous_positions,
+        &mut c.positions,
+        &mut c.grounded,
+        &r.time,
+    );
+
+    s.bridge_collision.run(
+        &c.positions,
+        &c.previous_positions,
+        &c.colliders,
+        &c.ignore_bridges,
+        &mut collisions,
+    );
+
+    s.fixed_collision.run(
+        &mut c.positions,
+        &c.previous_positions,
+        &mut c.grounded,
+        &mut c.wall_collisions,
+        &mut c.velocities,
+        &c.colliders,
+        &collisions,
+    );
+
+    s.player.run(c, r, &collisions);
+
+    s.environment.run(ctx, c, r)?;
+
+    s.fadeout.run(&mut r.fadeout);
+
+    s.animation
+        .run(&mut c.sprites, &mut c.animations, &mut r.animation_storage);
+
+    s.delayed_actions(ctx, c, r)?;
+
+    #[cfg(feature = "editor")]
+    s.editor.run(ctx, c, r)?;
+
+    systems::draw::scene(
+        ctx,
+        screen_buffer,
+        &c.positions,
+        &c.sprites,
+        &c.depths,
+        &c.mirrored,
+        &c.colliders,
+        &c.cameras,
+    )?;
+
+    if r.debug_draw {
+        systems::draw::debug_colliders(ctx, screen_buffer, &c.positions, &c.colliders, &c.cameras)?;
+    }
+
+    Ok(false)
 }
 
 pub fn load_window_icon<P: AsRef<Path>>(path: P) -> Result<Icon, image::ImageError> {

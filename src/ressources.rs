@@ -22,6 +22,7 @@ pub struct Ressources {
     pub fadeout: Option<Fadeout>,
     pub delayed_actions: Vec<DelayedAction>,
     pub last_save: SaveData,
+    pub debug_draw: bool,
 }
 
 impl Ressources {
@@ -36,6 +37,7 @@ impl Ressources {
             fadeout: None,
             delayed_actions: Vec::new(),
             last_save,
+            debug_draw: false,
         }
     }
 
