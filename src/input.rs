@@ -2,7 +2,7 @@ use crow::glutin::{ElementState, Event, EventsLoop, KeyboardInput, WindowEvent};
 
 pub use crow::glutin::{MouseButton, VirtualKeyCode as Key};
 
-use crate::config::WindowConfig;
+use crate::{config::WindowConfig, environment::CHUNK_HEIGHT};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InputEvent {
@@ -93,8 +93,11 @@ impl InputState {
                             position.0 / window_config.scale as i32,
                             position.1 / window_config.scale as i32,
                         );
-                        self.cursor_position =
-                            (scaled_pos.0, window_config.size.1 as i32 - scaled_pos.1);
+                        self.cursor_position = if cfg!(feature = "editor") {
+                            (scaled_pos.0, CHUNK_HEIGHT as i32 - scaled_pos.1)
+                        } else {
+                            (scaled_pos.0, window_config.size.1 as i32 - scaled_pos.1)
+                        };
                     }
                     _ => (),
                 }

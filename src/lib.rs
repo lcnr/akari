@@ -33,6 +33,9 @@ use crate::{
     save::SaveData, systems::Systems,
 };
 
+#[cfg(feature = "editor")]
+use environment::{CHUNK_HEIGHT, CHUNK_WIDTH};
+
 pub struct GlobalState {
     pub s: Systems,
     pub r: Ressources,
@@ -48,12 +51,21 @@ impl GlobalState {
     ) -> Result<Self, crow::Error> {
         let icon = load_window_icon(&config.window.icon_path).unwrap();
 
+        #[cfg(not(feature = "editor"))]
+        let window_size = (
+            config.window.size.0 * config.window.scale,
+            config.window.size.1 * config.window.scale,
+        );
+
+        #[cfg(feature = "editor")]
+        let window_size = (
+            CHUNK_WIDTH as u32 * config.window.scale,
+            CHUNK_HEIGHT as u32 * config.window.scale,
+        );
+
         let ctx = Context::new(
             WindowBuilder::new()
-                .with_dimensions(From::from((
-                    config.window.size.0 * config.window.scale,
-                    config.window.size.1 * config.window.scale,
-                )))
+                .with_dimensions(From::from(window_size))
                 .with_title(&config.window.title)
                 .with_window_icon(Some(icon)),
             EventsLoop::new(),
@@ -85,7 +97,10 @@ impl GlobalState {
         } = self;
 
         let mut surface = ctx.window_surface();
+        #[cfg(not(feature = "editor"))]
         let mut screen_buffer = Texture::new(&mut ctx, r.config.window.size)?;
+        #[cfg(feature = "editor")]
+        let mut screen_buffer = Texture::new(&mut ctx, (CHUNK_WIDTH as u32, CHUNK_HEIGHT as u32))?;
 
         r.time.restart();
         loop {
@@ -96,6 +111,12 @@ impl GlobalState {
 
             if r.input_state.update(ctx.events_loop(), &r.config.window) {
                 break Ok(());
+            }
+
+            for event in r.input_state.events() {
+                if &input::InputEvent::KeyDown(r.config.input.debug_toggle) == event {
+                    r.debug_draw = !r.debug_draw;
+                }
             }
 
             if frame(&mut ctx, &mut screen_buffer, &mut s, &mut c, &mut r)? {
@@ -126,6 +147,34 @@ impl GlobalState {
     }
 }
 
+#[cfg(feature = "editor")]
+pub fn editor_frame(
+    ctx: &mut Context,
+    screen_buffer: &mut Texture,
+    s: &mut Systems,
+    c: &mut Components,
+    r: &mut Ressources,
+) -> Result<bool, crow::Error> {
+    s.editor.run(ctx, c, r)?;
+
+    systems::draw::scene(
+        ctx,
+        screen_buffer,
+        &c.positions,
+        &c.sprites,
+        &c.depths,
+        &c.mirrored,
+        &c.colliders,
+        &c.cameras,
+    )?;
+
+    if r.debug_draw {
+        systems::draw::debug_colliders(ctx, screen_buffer, &c.positions, &c.colliders, &c.cameras)?;
+    }
+
+    Ok(false)
+}
+
 pub fn game_frame(
     ctx: &mut Context,
     screen_buffer: &mut Texture,
@@ -133,12 +182,6 @@ pub fn game_frame(
     c: &mut Components,
     r: &mut Ressources,
 ) -> Result<bool, crow::Error> {
-    for event in r.input_state.events() {
-        if &input::InputEvent::KeyDown(r.config.input.debug_toggle) == event {
-            r.debug_draw = !r.debug_draw;
-        }
-    }
-
     s.input_buffer.run(
         r.input_state.events(),
         &mut r.pressed_space,
@@ -196,9 +239,6 @@ pub fn game_frame(
         .run(&mut c.sprites, &mut c.animations, &mut r.animation_storage);
 
     s.delayed_actions(ctx, c, r)?;
-
-    #[cfg(feature = "editor")]
-    s.editor.run(ctx, c, r)?;
 
     systems::draw::scene(
         ctx,

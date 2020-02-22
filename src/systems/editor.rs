@@ -62,7 +62,6 @@ impl EditorSystem {
 
             let chunk_pos = r.world.chunks.iter().position(|c| c.position == chunk);
             if let Some(chunk) = chunk_pos.map(|pos| &mut r.world.chunks[pos]) {
-                dbg!(chunk.position);
                 chunk.data.tiles[tile.1 as usize][tile.0 as usize] = self.tile;
                 chunk.rebuild(ctx, c)?;
             } else {
