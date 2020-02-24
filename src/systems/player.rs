@@ -56,20 +56,15 @@ impl PlayerStateMachine {
 
             match *state {
                 PlayerState::Grounded | PlayerState::Airborne => {
-                    let direction = match (
-                        r.input_state.key(r.config.input.left),
-                        r.input_state.key(r.config.input.right),
-                    ) {
-                        (KeyState::Down, KeyState::Down) | (KeyState::Up, KeyState::Up) => 0.0,
-                        (KeyState::Down, KeyState::Up) => {
-                            c.mirrored.insert(entity, Mirrored);
-                            -1.0
-                        }
-                        (KeyState::Up, KeyState::Down) => {
-                            c.mirrored.remove(entity);
-                            1.0
-                        }
-                    };
+                    let direction = r
+                        .input_state
+                        .axis(r.config.input.left, r.config.input.right);
+
+                    if direction < -0.5 {
+                        c.mirrored.insert(entity, Mirrored);
+                    } else if direction > 0.5 {
+                        c.mirrored.remove(entity);
+                    }
 
                     let acceleration = if state == &mut PlayerState::Grounded {
                         r.config.player.grounded_acceleration

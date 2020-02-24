@@ -107,6 +107,14 @@ impl InputState {
         fin
     }
 
+    pub fn axis(&self, l: Key, r: Key) -> f32 {
+        match (self.key(l), self.key(r)) {
+            (KeyState::Down, KeyState::Down) | (KeyState::Up, KeyState::Up) => 0.0,
+            (KeyState::Down, KeyState::Up) => -1.0,
+            (KeyState::Up, KeyState::Down) => 1.0,
+        }
+    }
+
     pub fn key(&self, key: Key) -> KeyState {
         if self.pressed.contains(&key) {
             KeyState::Down
