@@ -6,8 +6,10 @@ use crow::Context;
 
 use crow_ecs::Joinable;
 
+#[cfg(feature = "editor")]
+use crate::config::StoreError;
 use crate::{
-    config::{Config, StoreError},
+    config::Config,
     data::{Components, Depth},
     ressources::Ressources,
 };

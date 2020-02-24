@@ -2,14 +2,19 @@ use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
-use crow::{Context, LoadTextureError, Texture};
+#[cfg(feature = "editor")]
+use crow::Texture;
+use crow::{Context, LoadTextureError};
 
+#[cfg(feature = "editor")]
 use crow_anim::Sprite;
 
 use crow_ecs::Entity;
 
+#[cfg(feature = "editor")]
+use crate::data::Depth;
 use crate::{
-    data::{Collider, ColliderType, Components, Depth, Position},
+    data::{Collider, ColliderType, Components, Position},
     environment::{Tile, CHUNK_HEIGHT, CHUNK_TILES, CHUNK_WIDTH, TILE_SIZE},
     spritesheet::SpriteSheet,
 };
