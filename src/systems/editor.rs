@@ -75,6 +75,16 @@ impl EditorSystem {
             } else {
                 error!("Tried to edit an nonexisting chunk");
             }
+        } else if r.input_state.mouse(MouseButton::Right) == KeyState::Down {
+            let (chunk, tile) = tile_on_click(c, r);
+
+            let chunk_pos = r.world.chunks.iter().position(|c| c.position == chunk);
+            if let Some(chunk) = chunk_pos.map(|pos| &mut r.world.chunks[pos]) {
+                chunk.data.tiles[tile.1 as usize][tile.0 as usize] = None;
+                chunk.rebuild(ctx, c)?;
+            } else {
+                error!("Tried to edit an nonexisting chunk");
+            }
         }
 
         Ok(())
