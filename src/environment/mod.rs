@@ -7,7 +7,7 @@ use crow::Context;
 use crow_ecs::Joinable;
 
 use crate::{
-    config::Config,
+    config::{Config, StoreError},
     data::{Components, Depth},
     ressources::Ressources,
 };
@@ -68,6 +68,27 @@ impl World {
 
     pub fn reset(&mut self) {
         self.chunks.clear();
+    }
+
+    #[cfg(feature = "editor")]
+    pub fn save(&mut self, c: &mut Components) -> Result<(), StoreError> {
+        for chunk in self.chunks.iter_mut() {
+            if let Some(changed) = chunk.changed.take() {
+                if let Some(path) = self.data.chunks.get(&chunk.position) {
+                    chunk.data.store(path)?;
+                } else {
+                    // TODO: fix default store
+                    chunk.data.store(format!(
+                        "ressources/environment/chunk{}x{}.ron",
+                        chunk.position.0, chunk.position.1
+                    ))?;
+                }
+
+                c.delete_entity(changed);
+            }
+        }
+
+        Ok(())
     }
 }
 

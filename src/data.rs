@@ -112,20 +112,20 @@ pub enum Depth {
     Grass,
     Player,
     Tiles,
-    EditorSelection,
+    Editor,
     Particles,
 }
 
 impl From<Depth> for f32 {
     fn from(depth: Depth) -> f32 {
         match depth {
-            Depth::Background => 0.3,
+            Depth::Editor => 0.0,
+            Depth::Particles => 0.3,
             Depth::Grass => 0.5,
             Depth::Tiles => 0.5,
             Depth::Player => 0.6,
             Depth::Bridges => 0.7,
-            Depth::EditorSelection => 0.8,
-            Depth::Particles => 0.9,
+            Depth::Background => 0.9,
         }
     }
 }

@@ -28,8 +28,28 @@ impl From<ron::de::Error> for LoadError {
     }
 }
 
+#[derive(Debug)]
+pub enum StoreError {
+    IoError(io::Error),
+    SerializeError(ron::ser::Error),
+}
+
+impl From<io::Error> for StoreError {
+    fn from(err: io::Error) -> Self {
+        StoreError::IoError(err)
+    }
+}
+
+impl From<ron::ser::Error> for StoreError {
+    fn from(err: ron::ser::Error) -> Self {
+        StoreError::SerializeError(err)
+    }
+}
+
 pub trait Config: Sized {
     fn load<P: AsRef<Path>>(path: P) -> Result<Self, LoadError>;
+
+    fn store<P: AsRef<Path>>(&self, path: P) -> Result<(), StoreError>;
 
     fn example() -> String
     where
@@ -40,6 +60,13 @@ impl<'a, T: DeserializeOwned + Serialize> Config for T {
     fn load<P: AsRef<Path>>(path: P) -> Result<Self, LoadError> {
         let f = File::open(path)?;
         Ok(ron::de::from_reader(f)?)
+    }
+
+    fn store<P: AsRef<Path>>(&self, path: P) -> Result<(), StoreError> {
+        let s = ron::ser::to_string_pretty(self, PrettyConfig::default())?;
+        let mut f = File::create(path)?;
+        <File as io::Write>::write_all(&mut f, s.as_bytes())?;
+        Ok(())
     }
 
     fn example() -> String

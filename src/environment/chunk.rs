@@ -2,12 +2,14 @@ use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
-use crow::{Context, LoadTextureError};
+use crow::{Context, LoadTextureError, Texture};
+
+use crow_anim::Sprite;
 
 use crow_ecs::Entity;
 
 use crate::{
-    data::{Collider, ColliderType, Components, Position},
+    data::{Collider, ColliderType, Components, Depth, Position},
     environment::{Tile, CHUNK_HEIGHT, CHUNK_TILES, CHUNK_WIDTH, TILE_SIZE},
     spritesheet::SpriteSheet,
 };
@@ -162,6 +164,8 @@ pub struct Chunk {
     pub tiles: Vec<Entity>,
     #[cfg(feature = "editor")]
     pub data: ChunkData,
+    #[cfg(feature = "editor")]
+    pub changed: Option<Entity>,
 }
 
 impl Drop for Chunk {
@@ -200,12 +204,36 @@ impl Chunk {
             tiles,
             #[cfg(feature = "editor")]
             data: ChunkData::default(),
+            #[cfg(feature = "editor")]
+            changed: None,
         }
     }
 
     #[cfg(feature = "editor")]
     pub fn rebuild(&mut self, ctx: &mut Context, c: &mut Components) -> Result<(), crow::Error> {
         self.clear(c);
+
+        let changed = c.new_entity();
+        self.changed = Some(changed);
+        c.positions.insert(
+            changed,
+            Position {
+                x: (self.position.0 * CHUNK_WIDTH as i32) as f32 + 10.0,
+                y: (self.position.1 * CHUNK_HEIGHT as i32) as f32 + 10.0,
+            },
+        );
+
+        let mut t = Texture::new(ctx, (5, 5))?;
+        ctx.clear_color(&mut t, (0.7, 0.0, 0.0, 1.0))?;
+        c.sprites.insert(
+            changed,
+            Sprite {
+                texture: t,
+                offset: (0, 0),
+            },
+        );
+
+        c.depths.insert(changed, Depth::Editor);
 
         let spritesheet = Self::build_spritesheet(ctx, &self.data.spritesheet).unwrap();
         // TODO: stop cloning data
@@ -233,6 +261,8 @@ impl Chunk {
             tiles: Vec::new(),
             #[cfg(feature = "editor")]
             data: data.clone(),
+            #[cfg(feature = "editor")]
+            changed: None,
         };
 
         for (y, line) in data.tiles.iter().enumerate() {
@@ -247,6 +277,13 @@ impl Chunk {
     pub fn clear(&mut self, c: &mut Components) {
         for e in self.tiles.drain(..) {
             c.delete_entity(e);
+        }
+
+        #[cfg(feature = "editor")]
+        {
+            if let Some(changed) = self.changed {
+                c.delete_entity(changed);
+            }
         }
     }
 

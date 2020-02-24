@@ -7,7 +7,7 @@ use crow_ecs::Joinable;
 use crate::{
     data::Components,
     environment::{Tile, CHUNK_HEIGHT, CHUNK_WIDTH, TILE_SIZE},
-    input::{InputEvent, KeyState, MouseButton},
+    input::{InputEvent, Key, KeyState, MouseButton},
     ressources::Ressources,
 };
 
@@ -63,6 +63,14 @@ impl EditorSystem {
                 Tile::Grass => Tile::Solid,
             };
             info!("Set editor tile to {:?}", self.tile);
+        }
+
+        if r.input_state.key(Key::LControl) == KeyState::Down
+            && r.input_state
+                .events()
+                .contains(&InputEvent::KeyDown(Key::S))
+        {
+            r.world.save(c).expect("TODO: error type");
         }
 
         if r.input_state.mouse(MouseButton::Left) == KeyState::Down {
