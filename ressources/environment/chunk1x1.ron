@@ -1,0 +1,21 @@
+(
+    spritesheet: "textures/grassland.png",
+    tiles: (
+        (Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),None,None,Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),),
+        (Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),None,Some(Grass),Some(Grass),None,None,None,None,Some(Solid),Some(Solid),Some(Solid),Some(Solid),),
+        (Some(Solid),Some(Solid),Some(Solid),Some(Spike),None,None,None,None,None,None,None,None,None,Some(Grass),None,Some(Solid),),
+        (Some(Solid),Some(Solid),Some(Solid),None,None,None,None,None,None,None,None,None,None,None,None,None,),
+        (Some(Solid),Some(Solid),Some(Solid),Some(Solid),None,None,None,None,None,None,None,None,None,None,None,None,),
+        (Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),None,None,None,None,None,None,None,None,None,None,Some(Solid),),
+        (Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),None,None,None,None,None,None,None,Some(Solid),Some(Solid),Some(Solid),),
+        (Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),None,None,None,None,None,None,None,Some(Solid),Some(Solid),Some(Solid),),
+        (Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),None,None,None,Some(Solid),Some(Solid),Some(Solid),),
+        (Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),),
+        (Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),),
+        (Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),),
+        (Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),),
+        (Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),),
+        (Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),),
+        (Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),Some(Solid),),
+    ),
+)

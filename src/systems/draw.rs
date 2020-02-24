@@ -19,8 +19,9 @@ pub fn scene<T: DrawTarget>(
     #[cfg(feature = "profiler")]
     profile_scope!("scene");
 
-    for (&Camera, camera_position) in (cameras, positions).join() {
-        for (&Position { x, y }, sprite, depth, mirrored, collider) in (
+    for (&Camera, &camera_position) in (cameras, positions).join() {
+        let (camera_x, camera_y) = camera_position.into();
+        for (&position, sprite, depth, mirrored, collider) in (
             positions,
             sprites,
             depths.maybe(),
@@ -29,8 +30,10 @@ pub fn scene<T: DrawTarget>(
         )
             .join()
         {
-            let x = (x - camera_position.x).round() as i32;
-            let y = (y - camera_position.y).round() as i32 - sprite.offset.1;
+            let (x, y) = position.into();
+
+            let x = x - camera_x;
+            let y = y - camera_y - sprite.offset.1;
 
             let (x, flip_horizontally) = if let Some(Mirrored) = mirrored {
                 let offset = sprite.texture.width() as i32

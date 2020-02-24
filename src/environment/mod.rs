@@ -76,17 +76,18 @@ impl World {
     pub fn save(&mut self, c: &mut Components) -> Result<(), StoreError> {
         for chunk in self.chunks.iter_mut() {
             if let Some(changed) = chunk.changed.take() {
-                if let Some(path) = self.data.chunks.get(&chunk.position) {
-                    chunk.data.store(path)?;
-                } else {
-                    // TODO: fix default store
-                    chunk.data.store(format!(
+                c.delete_entity(changed);
+
+                let path = self.data.chunks.entry(chunk.position).or_insert_with(|| {
+                    format!(
                         "ressources/environment/chunk{}x{}.ron",
                         chunk.position.0, chunk.position.1
-                    ))?;
-                }
+                    )
+                });
 
-                c.delete_entity(changed);
+                chunk.data.store(path)?;
+
+                self.data.store("ressources/environment/world.ron")?;
             }
         }
 

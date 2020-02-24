@@ -1,6 +1,8 @@
 (
     chunks: {
-        (0, 0): "ressources/environment/test_chunk.ron",
-        (1, 0): "ressources/environment/test_chunk2.ron",
+        (2,1,): "ressources/environment/chunk2x1.ron",
+        (0,0,): "ressources/environment/test_chunk.ron",
+        (1,1,): "ressources/environment/chunk1x1.ron",
+        (1,0,): "ressources/environment/test_chunk2.ron",
     },
 )
