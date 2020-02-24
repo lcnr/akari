@@ -63,7 +63,11 @@ impl<'a, T: DeserializeOwned + Serialize> Config for T {
     }
 
     fn store<P: AsRef<Path>>(&self, path: P) -> Result<(), StoreError> {
-        let s = ron::ser::to_string_pretty(self, PrettyConfig::default())?;
+        let s = ron::ser::to_string_pretty(self, PrettyConfig {
+            depth_limit: 3,
+            separate_tuple_members: true,
+            ..Default::default()
+        })?;
         let mut f = File::create(path)?;
         <File as io::Write>::write_all(&mut f, s.as_bytes())?;
         Ok(())
