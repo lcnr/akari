@@ -229,7 +229,7 @@ impl Chunk {
         );
 
         let mut t = Texture::new(ctx, (5, 5))?;
-        ctx.clear_color(&mut t, (0.7, 0.0, 0.0, 1.0))?;
+        ctx.clear_color(&mut t, (0.7, 0.0, 0.0, 1.0));
         c.sprites.insert(
             changed,
             Sprite {

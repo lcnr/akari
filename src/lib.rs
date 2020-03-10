@@ -106,8 +106,8 @@ impl GlobalState {
         loop {
             #[cfg(feature = "profiler")]
             profile_scope!("frame");
-            ctx.clear_color(&mut screen_buffer, (0.3, 0.3, 0.8, 1.0))?;
-            screen_buffer.clear_depth(&mut ctx)?;
+            ctx.clear_color(&mut screen_buffer, (0.3, 0.3, 0.8, 1.0));
+            ctx.clear_depth(&mut screen_buffer);
 
             if r.input_state.update(ctx.events_loop(), &r.config.window) {
                 break Ok(());
@@ -140,7 +140,7 @@ impl GlobalState {
                     color_modulation,
                     ..Default::default()
                 },
-            )?;
+            );
             ctx.finalize_frame()?;
             r.time.frame();
         }

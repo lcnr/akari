@@ -54,7 +54,7 @@ pub fn scene<T: DrawTarget>(
                     flip_horizontally,
                     ..Default::default()
                 },
-            )?;
+            );
         }
     }
 
@@ -90,7 +90,7 @@ pub fn debug_colliders<T: DrawTarget>(
             let x = x.round() as i32;
             let y = y.round() as i32;
 
-            ctx.debug_rectangle(target, (x, y), (xw - 1, yh - 1), color)?;
+            ctx.debug_rectangle(target, (x, y), (xw - 1, yh - 1), color);
         }
     }
 
