@@ -41,7 +41,6 @@ pub struct GlobalState {
     pub r: Ressources,
     pub c: Components,
     pub ctx: Context,
-    hidpi: u32,
 }
 
 impl GlobalState {
@@ -71,14 +70,11 @@ impl GlobalState {
                 .with_window_icon(Some(icon)),
         )?;
 
-        let hidpi = ctx.window().get_hidpi_factor().round() as u32;
-
         Ok(GlobalState {
             s: Systems::new(),
             r: Ressources::new(config, world_data, save_data),
             c: Components::new(),
             ctx,
-            hidpi,
         })
     }
 
@@ -97,7 +93,6 @@ impl GlobalState {
             mut r,
             mut c,
             mut ctx,
-            hidpi,
         } = self;
 
         let mut surface = ctx.window_surface();
@@ -140,7 +135,7 @@ impl GlobalState {
                 &screen_buffer,
                 (0, 0),
                 &DrawConfig {
-                    scale: (r.config.window.scale * hidpi, r.config.window.scale * hidpi),
+                    scale: (r.config.window.scale, r.config.window.scale),
                     color_modulation,
                     ..Default::default()
                 },
