@@ -276,7 +276,7 @@ dependencies = [
 [[package]]
 name = "crow"
 version = "0.4.0"
-source = "git+https://github.com/lcnr/crow#b7033ba8deafcfdfaf2feeea07c30ec370dee1fb"
+source = "git+https://github.com/lcnr/crow#e8fe743fb186f27f79d3c3d89484e7010799abf2"
 dependencies = [
  "gl",
  "glutin",

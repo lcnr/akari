@@ -12,7 +12,7 @@ extern crate log;
 use std::path::Path;
 
 use crow::{
-    glutin::{EventsLoop, Icon, WindowBuilder},
+    glutin::{Icon, WindowBuilder},
     image, Context, DrawConfig, Texture,
 };
 
@@ -68,7 +68,6 @@ impl GlobalState {
                 .with_dimensions(From::from(window_size))
                 .with_title(&config.window.title)
                 .with_window_icon(Some(icon)),
-            EventsLoop::new(),
         )?;
 
         Ok(GlobalState {
