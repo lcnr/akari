@@ -1,6 +1,6 @@
-use crow::glutin::{ElementState, Event, EventsLoop, KeyboardInput, WindowEvent};
+use crow::glutin::event::{ElementState, Event, KeyboardInput, WindowEvent};
 
-pub use crow::glutin::{MouseButton, VirtualKeyCode as Key};
+pub use crow::glutin::event::{MouseButton, VirtualKeyCode as Key};
 
 use crate::{config::WindowConfig, environment::CHUNK_HEIGHT};
 
@@ -31,78 +31,78 @@ impl InputState {
         Default::default()
     }
 
-    pub fn update(&mut self, events_loop: &mut EventsLoop, window_config: &WindowConfig) -> bool {
+    pub fn clear_events(&mut self) {
         self.events.clear();
-        let mut fin = false;
+    }
 
-        events_loop.poll_events(|e| {
-            if let Event::WindowEvent { event, .. } = e {
-                match event {
-                    WindowEvent::CloseRequested => fin = true,
-                    WindowEvent::KeyboardInput {
-                        input:
-                            KeyboardInput {
-                                virtual_keycode: Some(key),
-                                state: ElementState::Pressed,
-                                ..
-                            },
-                        ..
-                    } => {
-                        if !self.pressed.contains(&key) {
-                            self.pressed.push(key);
-                            self.events.push(InputEvent::KeyDown(key));
-                        }
+    pub fn update(&mut self, e: Event<()>, window_config: &WindowConfig) -> bool {
+        let mut fin = false;
+        if let Event::WindowEvent { event, .. } = e {
+            match event {
+                WindowEvent::CloseRequested => fin = true,
+                WindowEvent::KeyboardInput {
+                    input:
+                        KeyboardInput {
+                            virtual_keycode: Some(key),
+                            state: ElementState::Pressed,
+                            ..
+                        },
+                    ..
+                } => {
+                    if !self.pressed.contains(&key) {
+                        self.pressed.push(key);
+                        self.events.push(InputEvent::KeyDown(key));
                     }
-                    WindowEvent::KeyboardInput {
-                        input:
-                            KeyboardInput {
-                                virtual_keycode: Some(key),
-                                state: ElementState::Released,
-                                ..
-                            },
-                        ..
-                    } => {
-                        if let Some(idx) = self.pressed.iter().position(|&i| i == key) {
-                            self.pressed.remove(idx);
-                            self.events.push(InputEvent::KeyUp(key));
-                        }
-                    }
-                    WindowEvent::MouseInput {
-                        state: ElementState::Pressed,
-                        button,
-                        ..
-                    } => {
-                        if !self.mouse_pressed.contains(&button) {
-                            self.mouse_pressed.push(button);
-                            self.events.push(InputEvent::MouseDown(button));
-                        }
-                    }
-                    WindowEvent::MouseInput {
-                        state: ElementState::Released,
-                        button,
-                        ..
-                    } => {
-                        if let Some(idx) = self.mouse_pressed.iter().position(|&i| i == button) {
-                            self.mouse_pressed.remove(idx);
-                            self.events.push(InputEvent::MouseUp(button));
-                        }
-                    }
-                    WindowEvent::CursorMoved { position, .. } => {
-                        let position: (i32, i32) = position.into();
-                        let scaled_pos = (
-                            position.0 / window_config.scale as i32,
-                            position.1 / window_config.scale as i32,
-                        );
-                        self.cursor_position = if cfg!(feature = "editor") {
-                            (scaled_pos.0, CHUNK_HEIGHT as i32 - scaled_pos.1)
-                        } else {
-                            (scaled_pos.0, window_config.size.1 as i32 - scaled_pos.1)
-                        };
-                    }
-                    _ => (),
                 }
+                WindowEvent::KeyboardInput {
+                    input:
+                        KeyboardInput {
+                            virtual_keycode: Some(key),
+                            state: ElementState::Released,
+                            ..
+                        },
+                    ..
+                } => {
+                    if let Some(idx) = self.pressed.iter().position(|&i| i == key) {
+                        self.pressed.remove(idx);
+                        self.events.push(InputEvent::KeyUp(key));
+                    }
+                }
+                WindowEvent::MouseInput {
+                    state: ElementState::Pressed,
+                    button,
+                    ..
+                } => {
+                    if !self.mouse_pressed.contains(&button) {
+                        self.mouse_pressed.push(button);
+                        self.events.push(InputEvent::MouseDown(button));
+                    }
+                }
+                WindowEvent::MouseInput {
+                    state: ElementState::Released,
+                    button,
+                    ..
+                } => {
+                    if let Some(idx) = self.mouse_pressed.iter().position(|&i| i == button) {
+                        self.mouse_pressed.remove(idx);
+                        self.events.push(InputEvent::MouseUp(button));
+                    }
+                }
+                WindowEvent::CursorMoved { position, .. } => {
+                    let position: (i32, i32) = position.into();
+                    let scaled_pos = (
+                        position.0 / window_config.scale as i32,
+                        position.1 / window_config.scale as i32,
+                    );
+                    self.cursor_position = if cfg!(feature = "editor") {
+                        (scaled_pos.0, CHUNK_HEIGHT as i32 - scaled_pos.1)
+                    } else {
+                        (scaled_pos.0, window_config.size.1 as i32 - scaled_pos.1)
+                    };
+                }
+                _ => (),
             }
-        });
+        }
 
         fin
     }

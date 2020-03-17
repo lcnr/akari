@@ -1,6 +1,5 @@
 #![allow(clippy::too_many_arguments)]
-#![allow(clippy::match_ref_pats)]
-#![warn(clippy::cast_lossless)]
+#![warn(clippy::cast_lossless, clippy::match_ref_pats)]
 
 #[cfg(feature = "profiler")]
 #[macro_use]
@@ -12,7 +11,13 @@ extern crate log;
 use std::path::Path;
 
 use crow::{
-    glutin::{Icon, WindowBuilder},
+    glutin::{
+        dpi::LogicalSize,
+        event::Event,
+        event_loop::{ControlFlow, EventLoop},
+        window::Icon,
+        window::WindowBuilder,
+    },
     image, Context, DrawConfig, Texture,
 };
 
@@ -41,6 +46,7 @@ pub struct GlobalState {
     pub r: Ressources,
     pub c: Components,
     pub ctx: Context,
+    event_loop: EventLoop<()>,
 }
 
 impl GlobalState {
@@ -63,11 +69,13 @@ impl GlobalState {
             CHUNK_HEIGHT as u32 * config.window.scale,
         );
 
+        let event_loop = EventLoop::new();
         let ctx = Context::new(
             WindowBuilder::new()
-                .with_dimensions(From::from(window_size))
+                .with_inner_size(LogicalSize::<u32>::from(window_size))
                 .with_title(&config.window.title)
                 .with_window_icon(Some(icon)),
+            &event_loop,
         )?;
 
         Ok(GlobalState {
@@ -75,74 +83,89 @@ impl GlobalState {
             r: Ressources::new(config, world_data, save_data),
             c: Components::new(),
             ctx,
+            event_loop,
         })
     }
 
-    pub fn run<F>(self, mut frame: F) -> Result<(), crow::Error>
+    pub fn run<F>(self, mut frame: F) -> !
     where
-        F: FnMut(
-            &mut Context,
-            &mut Texture,
-            &mut Systems,
-            &mut Components,
-            &mut Ressources,
-        ) -> Result<bool, crow::Error>,
+        F: 'static
+            + FnMut(
+                &mut Context,
+                &mut Texture,
+                &mut Systems,
+                &mut Components,
+                &mut Ressources,
+            ) -> Result<bool, crow::Error>,
     {
         let GlobalState {
             mut s,
             mut r,
             mut c,
             mut ctx,
+            event_loop,
         } = self;
-
-        let mut surface = ctx.window_surface();
         #[cfg(not(feature = "editor"))]
-        let mut screen_buffer = Texture::new(&mut ctx, r.config.window.size)?;
+        let mut screen_buffer = Texture::new(&mut ctx, r.config.window.size).unwrap();
         #[cfg(feature = "editor")]
         let mut screen_buffer = Texture::new(&mut ctx, (CHUNK_WIDTH as u32, CHUNK_HEIGHT as u32))?;
 
         r.time.restart();
-        loop {
-            #[cfg(feature = "profiler")]
-            profile_scope!("frame");
-            ctx.clear_color(&mut screen_buffer, (0.3, 0.3, 0.8, 1.0));
-            ctx.clear_depth(&mut screen_buffer);
+        event_loop.run(
+            move |event: Event<()>, _window_target: _, control_flow: &mut ControlFlow| match event {
+                Event::NewEvents(_) => r.input_state.clear_events(),
+                Event::MainEventsCleared => ctx.window().request_redraw(),
+                Event::RedrawRequested(_) => {
+                    #[cfg(feature = "profiler")]
+                    profile_scope!("frame");
 
-            if r.input_state.update(ctx.events_loop(), &r.config.window) {
-                break Ok(());
-            }
+                    let mut surface = ctx.surface();
+                    ctx.clear_color(&mut screen_buffer, (0.3, 0.3, 0.8, 1.0));
+                    ctx.clear_depth(&mut screen_buffer);
 
-            for event in r.input_state.events() {
-                if &input::InputEvent::KeyDown(r.config.input.debug_toggle) == event {
-                    r.debug_draw = !r.debug_draw;
+                    for event in r.input_state.events() {
+                        if &input::InputEvent::KeyDown(r.config.input.debug_toggle) == event {
+                            r.debug_draw = !r.debug_draw;
+                        }
+                    }
+
+                    if frame(&mut ctx, &mut screen_buffer, &mut s, &mut c, &mut r).unwrap() {
+                        *control_flow = ControlFlow::Exit;
+                    }
+
+                    let fadeout = r.fadeout.as_ref().map_or(0.0, |f| f.current);
+                    let color_modulation = [
+                        [1.0 - fadeout, 0.0, 0.0, 0.0],
+                        [0.0, 1.0 - fadeout, 0.0, 0.0],
+                        [0.0, 0.0, 1.0 - fadeout, 0.0],
+                        [0.0, 0.0, 0.0, 1.0],
+                    ];
+
+                    ctx.draw(
+                        &mut surface,
+                        &screen_buffer,
+                        (0, 0),
+                        &DrawConfig {
+                            scale: (r.config.window.scale, r.config.window.scale),
+                            color_modulation,
+                            ..Default::default()
+                        },
+                    );
+
+                    ctx.present(surface).unwrap();
+                    r.time.frame();
                 }
-            }
-
-            if frame(&mut ctx, &mut screen_buffer, &mut s, &mut c, &mut r)? {
-                break Ok(());
-            }
-
-            let fadeout = r.fadeout.as_ref().map_or(0.0, |f| f.current);
-            let color_modulation = [
-                [1.0 - fadeout, 0.0, 0.0, 0.0],
-                [0.0, 1.0 - fadeout, 0.0, 0.0],
-                [0.0, 0.0, 1.0 - fadeout, 0.0],
-                [0.0, 0.0, 0.0, 1.0],
-            ];
-
-            ctx.draw(
-                &mut surface,
-                &screen_buffer,
-                (0, 0),
-                &DrawConfig {
-                    scale: (r.config.window.scale, r.config.window.scale),
-                    color_modulation,
-                    ..Default::default()
-                },
-            );
-            ctx.finalize_frame()?;
-            r.time.frame();
-        }
+                Event::LoopDestroyed => {
+                    #[cfg(feature = "profiler")]
+                    thread_profiler::write_profile("profile.json");
+                }
+                e => {
+                    if r.input_state.update(e, &r.config.window) {
+                        *control_flow = ControlFlow::Exit;
+                    }
+                }
+            },
+        )
     }
 }
 

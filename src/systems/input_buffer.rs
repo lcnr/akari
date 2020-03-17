@@ -18,12 +18,12 @@ impl InputBufferSystem {
         #[cfg(feature = "profiler")]
         profile_scope!("run");
 
-        if let &mut Some(JumpBuffer(c)) = space {
+        if let Some(JumpBuffer(c)) = *space {
             *space = c.checked_sub(1).map(JumpBuffer);
         }
 
         for event in events {
-            if &InputEvent::KeyDown(input_config.jump) == event {
+            if &InputEvent::KeyDown(input_config.jump) == *event {
                 *space = Some(JumpBuffer(buffer_config.jump_buffer_frames))
             }
         }

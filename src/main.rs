@@ -26,13 +26,8 @@ fn main() -> Result<(), crow::Error> {
         .run(&mut game.ctx, &mut game.c, &mut game.r)?;
 
     #[cfg(not(feature = "editor"))]
-    game.run(akari::game_frame)?;
+    game.run(akari::game_frame);
 
     #[cfg(feature = "editor")]
-    game.run(akari::editor_frame)?;
-
-    #[cfg(feature = "profiler")]
-    thread_profiler::write_profile("profile.json");
-
-    Ok(())
+    game.run(akari::editor_frame);
 }
