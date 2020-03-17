@@ -23,7 +23,7 @@ impl InputBufferSystem {
         }
 
         for event in events {
-            if &InputEvent::KeyDown(input_config.jump) == *event {
+            if InputEvent::KeyDown(input_config.jump) == *event {
                 *space = Some(JumpBuffer(buffer_config.jump_buffer_frames))
             }
         }

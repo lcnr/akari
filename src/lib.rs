@@ -108,7 +108,8 @@ impl GlobalState {
         #[cfg(not(feature = "editor"))]
         let mut screen_buffer = Texture::new(&mut ctx, r.config.window.size).unwrap();
         #[cfg(feature = "editor")]
-        let mut screen_buffer = Texture::new(&mut ctx, (CHUNK_WIDTH as u32, CHUNK_HEIGHT as u32))?;
+        let mut screen_buffer =
+            Texture::new(&mut ctx, (CHUNK_WIDTH as u32, CHUNK_HEIGHT as u32)).unwrap();
 
         r.time.restart();
         event_loop.run(
